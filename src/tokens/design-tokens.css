@@ -1,0 +1,156 @@
+/* ============================================================================
+   HOME SUITE — design tokens (single source of truth)
+   ----------------------------------------------------------------------------
+   Plain CSS custom properties so EVERY app shares one look regardless of stack:
+   the React/Next apps map these into Tailwind v4 @theme; the Python/family-agent
+   HTML UI @imports (or vendors) this file directly.
+
+   DARK-FIRST. The SUITE is everything below the "PER-APP ACCENT" block — fonts,
+   neutral surfaces, text, borders, radii, shadows, spacing, type scale, motion,
+   status, and the component classes. That is identical across every app.
+
+   PER-APP IDENTITY = the accent block (1 primary, optional 2nd) + the logo glyph.
+   Overriding just --color-accent* re-skins primary buttons, the active-nav pill,
+   links, focus rings, selection, and the logo tile — nothing else moves. Each app
+   ships a tiny accent override (see the commented examples) and its own data hues.
+   ============================================================================ */
+
+:root {
+  /* ---- Type: ONE shared font (Geist) ---------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-xs: 0.6875rem;  --leading-xs: 1rem;       /* 11px */
+  --text-sm: 0.8125rem;  --leading-sm: 1.125rem;   /* 13px */
+  --text-base: 0.9375rem;--leading-base: 1.5rem;   /* 15px */
+  --text-md: 1rem;       --leading-md: 1.5625rem;  /* 16px */
+  --text-lg: 1.125rem;   --leading-lg: 1.625rem;
+  --text-xl: 1.3125rem;  --leading-xl: 1.75rem;
+  --text-2xl: 1.625rem;  --leading-2xl: 2rem;
+  --weight-normal: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 680;
+
+  /* ---- Neutral surfaces (near-black) ---------------------------------------- */
+  --color-surface-0: #252422; /* cards / popovers */
+  --color-surface-1: #1c1b19; /* app canvas / page base */
+  --color-surface-2: #2e2c29; /* hover fill, table head, inset panel */
+  --color-surface-3: #363430; /* pressed / stronger fill */
+
+  --color-border: #343230;        /* hairline default */
+  --color-border-strong: #47453f; /* inputs, weighty dividers */
+
+  --color-fg: #f5f4f1;        /* primary text */
+  --color-fg-muted: #a8a6a0;  /* secondary text / labels */
+  --color-fg-subtle: #827f79; /* tertiary / placeholder / em-dash (AA on near-black) */
+
+  /* ---- PER-APP ACCENT — override these per app (default = neutral slate) -----
+     nutrition-tracker → emerald · family-advisor → indigo · go-links → sky-cyan.
+     Just re-declare this block in the app's own stylesheet (see examples at the
+     bottom of this file). Everything above + below stays shared. ------------- */
+  --color-accent: #64748b;        /* primary action */
+  --color-accent-hover: #94a3b8;
+  --color-accent-fg: #0b0f1a;     /* ink on the accent fill */
+  --color-accent-subtle: #1e293b; /* faint tint — active nav pill */
+  --color-accent-muted: #334155;  /* chip fill */
+  --color-accent-text: #cbd5e1;   /* accent-colored text/links on dark */
+  --color-ring: #94a3b8;          /* focus ring */
+
+  /* ---- Status (shared semantics; NOT the per-app accent) -------------------- */
+  --color-success: #46c98b; --color-success-subtle: #11241c; --color-success-text: #6fd8a4;
+  --color-danger: #f87171;  --color-danger-hover: #fca5a5;
+  --color-danger-fg: #2a0a0a; --color-danger-subtle: #2a1212;
+  --color-warning: #e0b341; --color-warning-subtle: #261f0e;
+
+  /* ---- Radii ---------------------------------------------------------------- */
+  --radius-xs: 0.25rem; --radius-sm: 0.375rem; --radius-md: 0.5rem;
+  --radius-lg: 0.625rem; --radius-xl: 0.875rem; --radius-2xl: 1rem; --radius-full: 999px;
+
+  /* ---- Spacing scale (for the plain-CSS apps; Tailwind apps use its scale) --- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+
+  /* ---- Elevation ------------------------------------------------------------ */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 12px -2px rgb(0 0 0 / 0.5);
+  --shadow-pop: 0 8px 28px -4px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.5);
+  --ring: 0 0 0 2px var(--color-surface-1), 0 0 0 4px var(--color-ring);
+
+  /* ---- Motion --------------------------------------------------------------- */
+  --dur-fast: 120ms; --dur-base: 180ms; --dur-slow: 240ms;
+  --ease-out: cubic-bezier(.2,.7,.3,1);
+  --ease-in-out: cubic-bezier(.4,0,.2,1);
+  --ease-spring: cubic-bezier(.34,1.4,.5,1);
+}
+
+/* ============================================================================
+   BASE LAYER — applies to plain-CSS apps directly. (The Tailwind apps replicate
+   this in their globals.css @layer base referencing the same vars.)
+   ============================================================================ */
+html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-surface-1);
+  color: var(--color-fg);
+  font: var(--text-base)/var(--leading-base) var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 { font-weight: var(--weight-semibold); letter-spacing: -0.014em; color: var(--color-fg); text-wrap: balance; }
+
+:where(a, button, [tabindex]):focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--radius-md); }
+::placeholder { color: var(--color-fg-subtle); }
+::selection { background: var(--color-accent-muted); color: var(--color-accent-text); }
+table, input, .tabular { font-variant-numeric: tabular-nums; }
+* { scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
+
+/* ============================================================================
+   COMPONENT CLASSES — for the plain-CSS / HTML apps (family-agent). The React
+   apps express the SAME recipes as Tailwind class strings (documented in AGENTS.md);
+   both read these tokens, so the look is identical.
+   ============================================================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-lg);
+  font: var(--weight-medium) var(--text-sm)/1 var(--font-sans);
+  border: 1px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+}
+.btn-primary { background: var(--color-accent); color: var(--color-accent-fg); }
+.btn-primary:hover { background: var(--color-accent-hover); }
+.btn-secondary { background: var(--color-surface-0); color: var(--color-fg); border-color: var(--color-border); }
+.btn-secondary:hover { background: var(--color-surface-2); }
+.btn-ghost { background: transparent; color: var(--color-fg-muted); }
+.btn-ghost:hover { background: var(--color-surface-2); color: var(--color-fg); }
+.btn-danger { background: var(--color-danger-subtle); color: var(--color-danger); }
+.btn-danger:hover { background: var(--color-danger); color: #fff; }
+
+.input {
+  width: 100%; border: 1px solid var(--color-border-strong); background: var(--color-surface-0);
+  color: var(--color-fg); border-radius: var(--radius-lg); padding: 8px 12px;
+  font: var(--text-sm)/1.2 var(--font-sans); box-shadow: var(--shadow-sm);
+}
+.input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-ring) 40%, transparent); }
+
+.card { background: var(--color-surface-0); border: 1px solid var(--color-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-soft); }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; border-radius: var(--radius-md); padding: 2px 6px; font: var(--weight-medium) var(--text-xs)/1.4 var(--font-sans); background: var(--color-surface-2); color: var(--color-fg-muted); }
+.chip-accent { background: var(--color-accent-muted); color: var(--color-accent-text); }
+
+/* ============================================================================
+   PER-APP ACCENT OVERRIDES — copy ONE block into the app's own CSS (or, in the
+   Tailwind apps, into the @theme + dark overrides). This is the only color an app
+   changes. Data hues (e.g. nutrition's macro colors) are added LOCALLY per app.
+   ----------------------------------------------------------------------------
+   nutrition-tracker (emerald):
+     --color-accent:#10b981; --color-accent-hover:#34d399; --color-accent-fg:#04221a;
+     --color-accent-subtle:#052e25; --color-accent-muted:#064e3b; --color-accent-text:#6ee7b7; --color-ring:#34d399;
+   family-advisor (indigo):
+     --color-accent:#6366f1; --color-accent-hover:#818cf8; --color-accent-fg:#ffffff;
+     --color-accent-subtle:#1e1b4b; --color-accent-muted:#312e81; --color-accent-text:#a5b4fc; --color-ring:#818cf8;
+   go-links (sky-cyan):
+     --color-accent:#0ea5e9; --color-accent-hover:#38bdf8; --color-accent-fg:#03192b;
+     --color-accent-subtle:#0c2a3f; --color-accent-muted:#075985; --color-accent-text:#7dd3fc; --color-ring:#38bdf8;
+   ============================================================================ */

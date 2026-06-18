@@ -1,0 +1,120 @@
+
+/* ============================================================================
+   HOME SUITE TEMPLATE — Design System (Tailwind v4 source-of-truth for React apps)
+   ----------------------------------------------------------------------------
+   Tailwind v4, CSS-first. NO tailwind.config.js. Dark-only (single theme).
+   Mirrors design-tokens.css (the portable copy the plain-CSS / family-agent UI
+   consumes). KEEP THE TWO IN SYNC — see scripts/sync-from-template.sh + AGENTS.md.
+
+   The SUITE = the surfaces / text / borders / radii / shadows / status below. It
+   is IDENTICAL across every app. PER-APP IDENTITY = the --color-accent* block +
+   the logo glyph (app/icon.svg). To re-skin an app, change ONLY the accent block
+   and add the app's own DATA hues (see the commented nutrition example).
+
+   Default accent = neutral slate (what a brand-new app starts on). Shipped apps:
+   nutrition-tracker → emerald · family-advisor → indigo · go-links → sky-cyan.
+   The accent is reserved for the single primary action, focus rings, active nav,
+   links-on-hover, and selection — NEVER for data hues.
+   ========================================================================== */
+
+@theme {
+  /* ---- Fonts: ONE shared font (Geist, injected by next/font in layout.tsx) ---- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Neutral surfaces (near-black) ---- */
+  --color-surface-0: #252422; /* cards / popovers */
+  --color-surface-1: #1c1b19; /* page base */
+  --color-surface-2: #2e2c29; /* hover fill, table head, inset panel */
+  --color-surface-3: #363430; /* pressed / stronger fill */
+
+  --color-border: #343230;        /* hairline default */
+  --color-border-strong: #47453f; /* inputs, weighty dividers */
+
+  --color-fg: #f5f4f1;        /* primary text */
+  --color-fg-muted: #a8a6a0;  /* secondary text / labels */
+  --color-fg-subtle: #827f79; /* tertiary / placeholder / em-dash (AA on near-black) */
+
+  /* ---- PER-APP ACCENT (default = neutral slate — OVERRIDE PER APP) ----
+     nutrition→emerald, family-advisor→indigo, go-links→sky. Swap these 7 values
+     (and the logo glyph) and the whole app re-skins. See accent recipes at the
+     bottom of design-tokens.css. */
+  --color-accent: #64748b;        /* primary action */
+  --color-accent-hover: #94a3b8;
+  --color-accent-fg: #0b0f1a;     /* ink on accent fill */
+  --color-accent-subtle: #1e293b; /* faint tint — active nav */
+  --color-accent-muted: #334155;  /* chip fill */
+  --color-accent-text: #cbd5e1;   /* accent text / links on dark */
+  --color-ring: #94a3b8;          /* focus ring */
+
+  /* ---- Status (shared semantics — NOT the per-app accent) ---- */
+  --color-success: #46c98b; --color-success-subtle: #11241c; --color-success-text: #6fd8a4;
+  --color-danger: #f87171;         /* destructive */
+  --color-danger-hover: #fca5a5;
+  --color-danger-fg: #2a0a0a;
+  --color-danger-subtle: #2a1212;
+  --color-warning: #e0b341; --color-warning-subtle: #261f0e;
+
+  /* ---- Radii ---- */
+  --radius-md: 0.5rem;   /* chips, small controls */
+  --radius-lg: 0.625rem; /* buttons, inputs, panels */
+  --radius-xl: 0.875rem; /* cards */
+  --radius-2xl: 1rem;    /* modals / sheets */
+
+  /* ---- Elevation ---- */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 12px -2px rgb(0 0 0 / 0.5);
+  --shadow-pop: 0 8px 28px -4px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.5);
+
+  /* ---- App DATA hues go HERE, per app (NOT in the shared layer). Example
+     (nutrition macros): --color-protein:#38bdf8; --color-fat:#fbbf24; … ---- */
+}
+
+/* ============================================================================
+   BASE LAYER
+   ========================================================================== */
+@layer base {
+  html { height: 100%; color-scheme: dark; -webkit-text-size-adjust: 100%; }
+
+  body {
+    min-height: 100%;
+    background: var(--color-surface-1);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 { font-weight: 600; letter-spacing: -0.014em; color: var(--color-fg); text-wrap: balance; }
+
+  table, input, .tabular { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  :where(a, button, [tabindex]):focus-visible { outline: 2px solid var(--color-ring); outline-offset: 2px; }
+
+  input, button, select, textarea { font: inherit; color: inherit; }
+  input, select, textarea { font-size: 16px; } /* kills iOS focus-zoom */
+  ::placeholder { color: var(--color-fg-subtle); }
+  ::selection { background: var(--color-accent-muted); color: var(--color-accent-text); }
+  a { color: inherit; text-underline-offset: 2px; }
+
+  * { scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
+}
+
+/* ============================================================================
+   COMPONENT SHORTCUTS — the few repeats. Everything else uses inline className
+   recipes documented in AGENTS.md (kept identical to design-tokens.css's classes).
+   ========================================================================== */
+@layer components {
+  .card {
+    background: var(--color-surface-0);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+/* Un-layered: enforce 16px on phones (beats text-sm/text-xs utilities → no iOS zoom). */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px; }
+}
