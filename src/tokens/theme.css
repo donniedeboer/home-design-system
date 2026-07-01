@@ -61,7 +61,7 @@
      (pulse=emerald, scout=teal) that sets only --color-accent* gets its OWN accent
      as the fill (var() substitution is lazy + scope-local) — AA-verified emerald
      6.63/8.75, teal 6.80/9.09 with their dark accent-fg. Bright jewel tones
-     (indigo/amethyst) darken --color-accent-btn* explicitly for white ink (accents.ts).
+     (indigo/orchid) darken --color-accent-btn* explicitly for white ink (accents.ts).
      Neutral fallback: white on #64748b(rest) = 4.76:1 (>=AA); registry-derived
      neutral #576478/#617087 (>=5:1) is the AA-safe explicit pair. */
   --color-accent: #64748b;        /* brand signal */

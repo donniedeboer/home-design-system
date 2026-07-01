@@ -51,19 +51,21 @@ export const glyphs: Record<AppGlyphName, ReactNode> = {
   ),
   // Pulse / heartbeat tick — flat, up-spike, down-spike, flat.
   pulse: <path d="M4 12h4l2-5 3 10 2-5h4" {...stroke} />,
-  // Located home — roofline framed by a pin, centered dot.
+  // Compass (Tabler "compass") — outer ring + a two-tone needle diamond + hub.
+  // General-purpose research/discovery; the old house-search glyph is retired.
   scout: (
     <g>
-      <path d="M4 11 12 5l8 6" {...stroke} />
-      <path d="M6 11v7h12v-7" {...stroke} />
-      <circle cx="12" cy="14" r="1.4" fill="var(--color-accent-fg)" />
+      <circle cx="12" cy="12" r="8.5" {...stroke} />
+      <path d="M15.5 8.5 10.5 10.5 8.5 15.5 13.5 13.5z" {...stroke} />
+      <circle cx="12" cy="12" r="1" fill="var(--color-accent-fg)" />
     </g>
   ),
-  // Chain link — two interlocking rounded link ovals.
+  // Link (Tabler "link") — two diagonal capsule half-links overlapping at center.
   golinks: (
     <g>
-      <rect x="3.5" y="9" width="10" height="6" rx="3" {...stroke} />
-      <rect x="10.5" y="9" width="10" height="6" rx="3" {...stroke} />
+      <path d="M9 15l6-6" {...stroke} />
+      <path d="M11 6.5l1.5-1.5a3.5 3.5 0 0 1 5 5L16 11.5" {...stroke} />
+      <path d="M13 17.5l-1.5 1.5a3.5 3.5 0 0 1-5-5L8 12.5" {...stroke} />
     </g>
   ),
   // Robot head — rounded head, two dot eyes, antenna.

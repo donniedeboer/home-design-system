@@ -183,7 +183,18 @@ function deriveButton(seed: Seed): Pick<Accent, 'accentBtn' | 'accentBtnHover' |
 
 const SEEDS: Record<AccentName, Seed> = {
   omni:    { accent: '#6366f1', accentHover: '#818cf8', accentSubtle: '#1e1b4b', accentMuted: '#312e81', accentText: '#a5b4fc', ring: '#818cf8' },
-  persona: { accent: '#8b5cf6', accentHover: '#a78bfa', accentSubtle: '#2e1065', accentMuted: '#5b21b6', accentText: '#c4b5fd', ring: '#a78bfa' },
+  // Persona = ORCHID/magenta (was amethyst #8b5cf6). Deep jewel tone → white ink; button
+  // fill DARKENS from the brand so white clears AA (white on brand #c026d3 = 4.71 — passes
+  // AA but the trio targets 6.0/5.0 headroom, so the fill drops to #a521b6/#b925cc). All
+  // ratios recomputed with real WCAG math (scripts/check-accents.ts recomputes independently):
+  //   accent          #c026d3  seed (nav pill / ring / links / logo tile); white-ink polarity (lum 0.173 < 0.25)
+  //   accentBtn       #a521b6  white ×btn        = 6.01  (DERIVED, darkened for white ink)
+  //   accentBtnHover  #b925cc  white ×btn-hover  = 5.00  (DERIVED)
+  //   accentFg        #ffffff
+  //   accentText      #f0abfc  ×surface-0 8.81 · ×surface-1 9.78 · ×surface-2 7.91 · ×surface-3 7.06 (all ≥4.5)
+  //   accentSubtle    #3b0764  accent-text ×subtle = 8.52   accentMuted #86198f  accent-text ×muted = 4.68
+  //   ring            #d946ef  ×surface-0 4.48 · -1 4.98 · -2 4.03 · -3 3.59 (all ≥3:1)
+  persona: { accent: '#c026d3', accentHover: '#d946ef', accentSubtle: '#3b0764', accentMuted: '#86198f', accentText: '#f0abfc', ring: '#d946ef' },
   pulse:   { accent: '#10b981', accentHover: '#34d399', accentSubtle: '#052e25', accentMuted: '#064e3b', accentText: '#6ee7b7', ring: '#34d399' },
   scout:   { accent: '#14b8a6', accentHover: '#2dd4bf', accentSubtle: '#032725', accentMuted: '#0f766e', accentText: '#5eead4', ring: '#2dd4bf' },
   golinks: { accent: '#0ea5e9', accentHover: '#38bdf8', accentSubtle: '#0c2a3f', accentMuted: '#075985', accentText: '#7dd3fc', ring: '#38bdf8' },

@@ -68,7 +68,7 @@
      (pulse=emerald, scout=teal) that sets only --color-accent* automatically gets
      its OWN accent as the button fill (CSS var() substitution is lazy + scope-local,
      so it re-resolves at the app's scope) — computed AA: emerald 6.63/8.75, teal
-     6.80/9.09 with their dark accent-fg. Bright jewel tones (indigo/amethyst) are
+     6.80/9.09 with their dark accent-fg. Bright jewel tones (indigo/orchid) are
      too light for white ink, so THOSE apps darken --color-accent-btn* explicitly
      (see accents.ts + the recipe comments below). --color-accent stays the brand
      signal color (active-nav pill via subtle+text, links, ring).
@@ -193,7 +193,7 @@ table, input, .tabular { font-variant-numeric: tabular-nums; }
    The accent-btn / accent-btn-hover / accent-fg trio is DERIVED from the brand
    `accent` by src/tokens/accents.ts (WCAG rule), not hand-tuned. Every ink×fill and
    ink×hover-fill pair clears AA 4.5:1. WHITE-INK apps (bright jewel tones: indigo,
-   amethyst) MUST paste accent-btn/-btn-hover because their fill is darkened below the
+   orchid) MUST paste accent-btn/-btn-hover because their fill is darkened below the
    brand color for white ink to pass. DARK-INK apps (emerald, teal, sky, amber) OMIT
    accent-btn/-btn-hover — the default `--color-accent-btn: var(--color-accent)` makes
    their own accent the fill (verified >=4.5 with their dark accent-fg). Regenerate:
@@ -203,10 +203,10 @@ table, input, .tabular { font-variant-numeric: tabular-nums; }
      --color-accent:#6366f1; --color-accent-hover:#818cf8;
      --color-accent-btn:#474aee; --color-accent-btn-hover:#585bf0; --color-accent-fg:#ffffff;
      --color-accent-subtle:#1e1b4b; --color-accent-muted:#312e81; --color-accent-text:#a5b4fc; --color-ring:#818cf8;
-   Persona (amethyst · white ink · 6.01/5.02:1 — DARKENED fill, keep accent-btn):
-     --color-accent:#8b5cf6; --color-accent-hover:#a78bfa;
-     --color-accent-btn:#6f35f4; --color-accent-btn-hover:#7e4af5; --color-accent-fg:#ffffff;
-     --color-accent-subtle:#2e1065; --color-accent-muted:#5b21b6; --color-accent-text:#c4b5fd; --color-ring:#a78bfa;
+   Persona (orchid · white ink · 6.01/5.00:1 — DARKENED fill, keep accent-btn):
+     --color-accent:#c026d3; --color-accent-hover:#d946ef;
+     --color-accent-btn:#a521b6; --color-accent-btn-hover:#b925cc; --color-accent-fg:#ffffff;
+     --color-accent-subtle:#3b0764; --color-accent-muted:#86198f; --color-accent-text:#f0abfc; --color-ring:#d946ef;
    Pulse (emerald · deep-tint ink · 6.63/8.75:1 — fill = accent, OMIT accent-btn):
      --color-accent:#10b981; --color-accent-hover:#34d399; --color-accent-fg:#04221a;
      --color-accent-subtle:#052e25; --color-accent-muted:#064e3b; --color-accent-text:#6ee7b7; --color-ring:#34d399;
