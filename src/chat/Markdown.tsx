@@ -30,7 +30,7 @@ import DOMPurify from 'dompurify';
 // and deterministic. We sanitize afterwards regardless.
 const MARKED_OPTIONS: MarkedOptions = {
   gfm: true,
-  breaks: false,
+  breaks: true,
 };
 
 // Force safe link behavior on every anchor. Registered once (idempotent guard below).
