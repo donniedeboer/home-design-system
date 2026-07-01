@@ -20,6 +20,7 @@
   "files": ["dist", "src/tokens", "src/icon.svg"],
   "scripts": {
     "build": "tsup",
+    "prepare": "npm run build",
     "typecheck": "tsc --noEmit",
     "check:accents": "node --experimental-strip-types scripts/check-accents.ts",
     "gen:accents": "node --experimental-strip-types scripts/check-accents.ts --css",
