@@ -32,10 +32,21 @@ Dark-only — no light theme, no switcher.
 
 ## Hard rules
 
+- **Never hand-roll hex in an app.** Every color a component renders must resolve to a
+  design-system token (`text-fg`, `bg-surface-0`, `text-diff-added`, …). No raw `#rrggbb`
+  in JSX/`className`/`style` and no arbitrary-value utilities like `text-[#6fd8a4]`. The
+  only hex that belongs in an app is the 7-var `--color-accent*` override in its `@theme`
+  (and genuinely app-local *data* hues, below). If a shared color is missing, add a token
+  here — don't inline it. (Non-React/HTML apps: same rule via `tokens.css` vars — see Consume it.)
 - The **accent** is for the single primary action, focus rings, the active-nav pill,
   links-on-hover, and selection — **never** for data/category colors.
 - **Data hues are per-app and local** (e.g. nutrition's macro colors live in nutrition's
-  own `@theme`, never here).
+  own `@theme`, never here). *Cross-app* semantic colors (status, git-diffs) are shared —
+  they live here, not per-app.
+- **Git-diff colors are shared tokens** — `--color-diff-added-fg` / `-added-bg` /
+  `--color-diff-removed-fg` / `-removed-bg` (added 2026-07-01, alongside the status ramp
+  in `theme.css`/`design-tokens.css`). Any diff/changelog surface (Persona's Review +
+  Changes, a future Omni diff view, …) uses `text-diff-added bg-diff-added-bg` etc.
 - Numeric/tabular data uses `tabular-nums` (already in the base layer).
 
 ## Component recipes (className strings)
@@ -47,6 +58,7 @@ Dark-only — no light theme, no switcher.
 - Danger: `… bg-danger-subtle text-danger hover:bg-danger hover:text-white`
 - Input: `w-full bg-surface-0 border border-border-strong rounded-lg px-3 py-2 focus:border-accent focus:ring-2 focus:ring-ring/40 focus:outline-none`
 - Chip: `inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs bg-surface-2 text-fg-muted`
+- Diff line (added): `text-diff-added bg-diff-added-bg` · (removed): `text-diff-removed bg-diff-removed-bg`
 
 ## Components
 

@@ -45,6 +45,7 @@ export { default as Gallery } from './widgets/Gallery';
 export { default as SongCard } from './widgets/SongCard';
 export { default as Aesthetic } from './widgets/Aesthetic';
 export { default as MultiChoice } from './widgets/MultiChoice';
+export { default as Diff } from './widgets/Diff';
 export { Widget, widgetRegistry } from './widgets/registry';
 export {
   type WidgetVariant,
@@ -61,6 +62,7 @@ export {
   type SongData,
   type AestheticData,
   type MultiChoiceData,
+  type DiffData,
 } from './widgets/types';
 
 // ── Accent registry ──────────────────────────────────────────────────────────

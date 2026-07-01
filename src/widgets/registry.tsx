@@ -8,6 +8,7 @@ import Gallery from './Gallery';
 import SongCard from './SongCard';
 import Aesthetic from './Aesthetic';
 import MultiChoice from './MultiChoice';
+import Diff from './Diff';
 
 /**
  * type → component registry. The AgentChat parser looks a descriptor's `type` up
@@ -22,6 +23,7 @@ export const widgetRegistry: Record<WidgetType, ComponentType<WidgetProps<any>>>
   song: SongCard,
   aesthetic: Aesthetic,
   multichoice: MultiChoice,
+  diff: Diff,
 };
 
 /**

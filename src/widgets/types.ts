@@ -90,6 +90,22 @@ export interface MultiChoiceData {
   multi?: boolean;
 }
 
+export interface DiffData {
+  entity?: string;
+  key?: string;
+  /** previous value (omit/empty for an add). */
+  old?: string | number | null;
+  /** proposed value (omit/empty for a remove). */
+  new?: string | number | null;
+  visibility?: string;
+  /** the change kind — 'edit' (default) | 'add' | 'remove'. */
+  op?: 'edit' | 'add' | 'remove' | string;
+  /** proposal id when queued for review; drives the Accept/Dismiss buttons. */
+  proposalId?: string;
+  /** 'committed' (auto-applied, nothing to accept) | 'queued'. */
+  status?: 'committed' | 'queued' | string;
+}
+
 export type WidgetDescriptor =
   | { type: 'movie'; variant?: WidgetVariant; data: MovieData; fallback?: string }
   | { type: 'listing'; variant?: WidgetVariant; data: ListingData; fallback?: string }
@@ -97,7 +113,8 @@ export type WidgetDescriptor =
   | { type: 'gallery'; variant?: WidgetVariant; data: GalleryData; fallback?: string }
   | { type: 'song'; variant?: WidgetVariant; data: SongData; fallback?: string }
   | { type: 'aesthetic'; variant?: WidgetVariant; data: AestheticData; fallback?: string }
-  | { type: 'multichoice'; variant?: WidgetVariant; data: MultiChoiceData; fallback?: string };
+  | { type: 'multichoice'; variant?: WidgetVariant; data: MultiChoiceData; fallback?: string }
+  | { type: 'diff'; variant?: WidgetVariant; data: DiffData; fallback?: string };
 
 export type WidgetType = WidgetDescriptor['type'];
 
