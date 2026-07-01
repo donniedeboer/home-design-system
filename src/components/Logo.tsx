@@ -28,53 +28,71 @@ const stroke = {
 
 /** Built-in glyphs — one geometry, 24×24 grid, stroke-width 2, currentColor=accent-fg. */
 export const glyphs: Record<AppGlyphName, ReactNode> = {
-  // Orchestrator hub — center dot + N/E/S/W nodes with spokes. The suite master mark.
+  // Orchestrator hub — Tabler "topology-star-3": seven nodes + spokes. The suite master mark.
   omni: (
     <g>
-      <line x1="12" y1="12" x2="12" y2="4" {...stroke} />
-      <line x1="12" y1="12" x2="19" y2="12" {...stroke} />
-      <line x1="12" y1="12" x2="12" y2="20" {...stroke} />
-      <line x1="12" y1="12" x2="5" y2="12" {...stroke} />
-      <circle cx="12" cy="12" r="2.4" fill="var(--color-accent-fg)" />
-      <circle cx="12" cy="4" r="1.6" fill="var(--color-accent-fg)" />
-      <circle cx="19" cy="12" r="1.6" fill="var(--color-accent-fg)" />
-      <circle cx="12" cy="20" r="1.6" fill="var(--color-accent-fg)" />
-      <circle cx="5" cy="12" r="1.6" fill="var(--color-accent-fg)" />
+      <path d="M10 19a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M18 5a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M10 5a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M6 12a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M18 19a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M14 12a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M22 12a2 2 0 1 0 -4 0a2 2 0 0 0 4 0" {...stroke} />
+      <path d="M6 12h4" {...stroke} />
+      <path d="M14 12h4" {...stroke} />
+      <path d="M15 7l-2 3" {...stroke} />
+      <path d="M9 7l2 3" {...stroke} />
+      <path d="M11 14l-2 3" {...stroke} />
+      <path d="M13 14l2 3" {...stroke} />
     </g>
   ),
-  // Open book / layered memory — two facing leaves + spine.
+  // Open book / layered memory — Tabler "book-2".
   persona: (
     <g>
-      <path d="M12 6c-1.6-1.3-4-1.8-7-1.5v12c3-.3 5.4.2 7 1.5 1.6-1.3 4-1.8 7-1.5v-12c-3-.3-5.4.2-7 1.5z" {...stroke} />
-      <path d="M12 6v12" {...stroke} />
+      <path d="M19 4v16h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12" {...stroke} />
+      <path d="M19 16h-12a2 2 0 0 0 -2 2" {...stroke} />
+      <path d="M9 8h6" {...stroke} />
     </g>
   ),
-  // Pulse / heartbeat tick — flat, up-spike, down-spike, flat.
-  pulse: <path d="M4 12h4l2-5 3 10 2-5h4" {...stroke} />,
-  // Compass (Tabler "compass") — outer ring + a two-tone needle diamond + hub.
+  // Pulse / heartbeat — Tabler "heartbeat".
+  pulse: (
+    <g>
+      <path d="M19.5 13.572l-7.5 7.428l-2.896 -2.868m-6.117 -8.104a5 5 0 0 1 9.013 -3.022a5 5 0 1 1 7.5 6.572" {...stroke} />
+      <path d="M3 13h2l2 3l2 -6l1 3h3" {...stroke} />
+    </g>
+  ),
+  // Compass (Tabler "compass") — outer ring + needle diamond + cardinal ticks.
   // General-purpose research/discovery; the old house-search glyph is retired.
   scout: (
     <g>
-      <circle cx="12" cy="12" r="8.5" {...stroke} />
-      <path d="M15.5 8.5 10.5 10.5 8.5 15.5 13.5 13.5z" {...stroke} />
-      <circle cx="12" cy="12" r="1" fill="var(--color-accent-fg)" />
+      <path d="M8 16l2 -6l6 -2l-2 6l-6 2" {...stroke} />
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" {...stroke} />
+      <path d="M12 3l0 2" {...stroke} />
+      <path d="M12 19l0 2" {...stroke} />
+      <path d="M3 12l2 0" {...stroke} />
+      <path d="M19 12l2 0" {...stroke} />
     </g>
   ),
   // Link (Tabler "link") — two diagonal capsule half-links overlapping at center.
   golinks: (
     <g>
-      <path d="M9 15l6-6" {...stroke} />
-      <path d="M11 6.5l1.5-1.5a3.5 3.5 0 0 1 5 5L16 11.5" {...stroke} />
-      <path d="M13 17.5l-1.5 1.5a3.5 3.5 0 0 1-5-5L8 12.5" {...stroke} />
+      <path d="M9 15l6 -6" {...stroke} />
+      <path d="M11 6l.463 -.536a5 5 0 0 1 7.071 7.072l-.534 .464" {...stroke} />
+      <path d="M13 18l-.397 .534a5.068 5.068 0 0 1 -7.127 0a4.972 4.972 0 0 1 0 -7.071l.524 -.463" {...stroke} />
     </g>
   ),
-  // Robot head — rounded head, two dot eyes, antenna.
+  // Robot head — Tabler "robot": rounded head, antenna, body, dot eyes.
   devbot: (
     <g>
-      <line x1="12" y1="4" x2="12" y2="7" {...stroke} />
-      <rect x="5" y="7" width="14" height="12" rx="3" {...stroke} />
-      <circle cx="9.5" cy="13" r="1.3" fill="var(--color-accent-fg)" />
-      <circle cx="14.5" cy="13" r="1.3" fill="var(--color-accent-fg)" />
+      <path d="M6 6a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -4" {...stroke} />
+      <path d="M12 2v2" {...stroke} />
+      <path d="M9 12v9" {...stroke} />
+      <path d="M15 12v9" {...stroke} />
+      <path d="M5 16l4 -2" {...stroke} />
+      <path d="M15 14l4 2" {...stroke} />
+      <path d="M9 18h6" {...stroke} />
+      <path d="M10 8v.01" {...stroke} />
+      <path d="M14 8v.01" {...stroke} />
     </g>
   ),
   // Generic module — hollow rounded square + center dot (default/unassigned).
