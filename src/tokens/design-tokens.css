@@ -16,7 +16,7 @@
 
    ACCENT MECHANISM (BUILD-TIME, not runtime): an app's own globals.css does
        @import "home-design-system/theme.css";
-       @theme { --color-accent: ...; ... }   /* its 7-var accent override */
+       @theme { --color-accent: ...; ... }   (its 7-var accent override)
    Tailwind v4 @theme does NOT honor :root[data-app=...] selectors, so there are
    deliberately NO data-app selectors here. Copy one accent block below into your
    app's @theme (or use the machine-readable accents.ts registry).
@@ -93,6 +93,10 @@
   --color-danger-subtle: #2a1212; --color-danger-text: #fca5a5;
   --color-warning: #e0b341; --color-warning-hover: #edc766; --color-warning-fg: #241c06;
   --color-warning-subtle: #261f0e; --color-warning-text: #edc766;
+
+  /* ---- Diff hues (shared git-diff colors — NOT the per-app accent) ---------- */
+  --color-diff-added-bg: #0f2018;  --color-diff-added-fg: #6fd8a4;
+  --color-diff-removed-bg: #241310; --color-diff-removed-fg: #f0795f;
 
   /* ---- Radii ---------------------------------------------------------------- */
   --radius-xs: 0.25rem; --radius-sm: 0.375rem; --radius-md: 0.5rem;
