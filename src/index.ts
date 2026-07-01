@@ -24,7 +24,7 @@ export { default as SideNav, type NavSection } from './components/SideNav';
 export { default as Modal } from './components/Modal';
 export { default as Button } from './components/Button';
 export { Input, Select } from './components/Field';
-export { Chip, StatChip, StatGrid, DataGrid, ListRow } from './components/data';
+export { Chip, StatChip, StatGrid, DataGrid, ListRow, Card, CardList } from './components/data';
 export { default as FeedbackWidget } from './components/FeedbackWidget';
 
 // ── Chat surface ─────────────────────────────────────────────────────────────

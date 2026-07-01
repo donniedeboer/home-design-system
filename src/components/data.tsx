@@ -142,3 +142,73 @@ export function ListRow({
   }
   return <div className={cls}>{inner}</div>;
 }
+
+/**
+ * Card — THE standard surface for one item in a list: an individual, spaced, bordered
+ * card (rounded-lg + hairline border + surface-0 + p-4). This is the shared "a thing in
+ * a list" look across the suite — use it (not ad-hoc bordered divs) so cards read the
+ * same everywhere. Clickable when given `onClick`/`href` (hover lifts the border).
+ */
+export function Card({
+  children,
+  onClick,
+  href,
+  interactive,
+  className = '',
+  router,
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+  href?: string;
+  interactive?: boolean;
+  className?: string;
+  router?: RouterAdapter;
+}) {
+  const ctxRouter = useRouter();
+  const { Link } = router ?? ctxRouter;
+  const hoverable = interactive || !!onClick || !!href;
+  const cls = `rounded-lg border border-border bg-surface-0 p-4 ${
+    hoverable ? 'transition-colors hover:border-border-strong' : ''
+  } ${className}`;
+  if (href) {
+    return (
+      <Link href={href} className={`block ${cls}`}>
+        {children}
+      </Link>
+    );
+  }
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} className={`block w-full text-left ${cls}`}>
+        {children}
+      </button>
+    );
+  }
+  return <div className={cls}>{children}</div>;
+}
+
+/**
+ * CardList — a set of Cards with ONE consistent gap. `direction="vertical"` (default)
+ * stacks them; `direction="horizontal"` lays the SAME cards out in a scrolling row (each
+ * gets a min width). One component, both orientations, so vertical and horizontal lists
+ * of cards always read as the same design — never a bespoke re-invention.
+ */
+export function CardList({
+  direction = 'vertical',
+  children,
+  className = '',
+}: {
+  direction?: 'vertical' | 'horizontal';
+  children: ReactNode;
+  className?: string;
+}) {
+  return direction === 'horizontal' ? (
+    <div
+      className={`flex gap-3 overflow-x-auto pb-1 [&>*]:min-w-[240px] [&>*]:shrink-0 ${className}`}
+    >
+      {children}
+    </div>
+  ) : (
+    <div className={`flex flex-col gap-3 ${className}`}>{children}</div>
+  );
+}
