@@ -60,7 +60,7 @@ export default function MultiChoice({ data, onAction }: WidgetProps<MultiChoiceD
     `rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)] ${
       active
         ? 'border-transparent bg-accent-subtle text-accent-text'
-        : 'border-border-strong text-fg-muted hover:bg-surface-2 hover:text-fg'
+        : 'border-border-control text-fg-muted hover:bg-surface-2 hover:text-fg'
     } ${answered ? 'opacity-60' : ''}`;
 
   return (

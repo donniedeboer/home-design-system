@@ -262,7 +262,7 @@ function Composer({
 
   return (
     <div className="border-t border-border pt-2">
-      <div className="flex items-end gap-2 rounded-2xl border border-border-strong bg-surface-0 px-3 py-2 focus-within:border-[color:var(--color-accent)]">
+      <div className="flex items-end gap-2 rounded-2xl border border-border-control bg-surface-0 px-3 py-2 focus-within:border-[color:var(--color-accent)]">
         <textarea
           ref={taRef}
           value={value}

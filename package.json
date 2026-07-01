@@ -21,6 +21,8 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
+    "check:accents": "node --experimental-strip-types scripts/check-accents.ts",
+    "gen:accents": "node --experimental-strip-types scripts/check-accents.ts --css",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {

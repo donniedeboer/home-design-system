@@ -5,8 +5,11 @@ import type { GalleryData, WidgetProps } from './types';
 /**
  * Gallery [P] — compact = cover + "N photos" overlay + up to ~4 thumbs; full = a
  * thumb rail. Clicking any thumb opens an accessible lightbox: role=dialog +
- * aria-modal, Escape closes, arrow keys page, focus is trapped inside, and focus
- * returns to the trigger on close. Honors prefers-reduced-motion via CSS tokens.
+ * aria-modal, Escape closes, arrow keys page. On open, focus moves to the close
+ * button; Tab/Shift+Tab are trapped (intercepted from the container itself, not just
+ * at the first/last control, so focus can't escape); the background is scroll-locked
+ * and marked inert + aria-hidden. Focus returns to the trigger on close. Honors
+ * prefers-reduced-motion via CSS tokens.
  */
 export default function Gallery({ data, variant = 'compact' }: WidgetProps<GalleryData>) {
   const images = data.images ?? [];
@@ -105,10 +108,47 @@ function Lightbox({
   onClose: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+
+  // On open: move focus to the first focusable control (the close button), lock
+  // background scroll, and mark everything outside the dialog inert + aria-hidden so
+  // AT and Tab can't escape. All restored on close. (Runs once per mount.)
+  useEffect(() => {
+    const el = dialogRef.current;
+    closeRef.current?.focus();
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+
+    // Inert + hide every top-level sibling of the dialog's owner (the whole app
+    // background). We toggle attributes and remember which we set so we only clear ours.
+    const marked: HTMLElement[] = [];
+    for (const node of Array.from(document.body.children)) {
+      const child = node as HTMLElement;
+      if (el && child.contains(el)) continue; // keep the branch that holds the dialog
+      if (!child.hasAttribute('aria-hidden')) {
+        child.setAttribute('aria-hidden', 'true');
+        child.setAttribute('data-gallery-inert', '');
+        // `inert` blocks focus/pointer inside the background subtree.
+        (child as HTMLElement & { inert?: boolean }).inert = true;
+        marked.push(child);
+      }
+    }
+
+    return () => {
+      document.body.style.overflow = overflow;
+      for (const child of marked) {
+        child.removeAttribute('aria-hidden');
+        child.removeAttribute('data-gallery-inert');
+        (child as HTMLElement & { inert?: boolean }).inert = false;
+      }
+    };
+    // Only re-run on open/close (mount/unmount), not per page-change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const el = dialogRef.current;
-    el?.focus();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -119,20 +159,29 @@ function Lightbox({
       } else if (e.key === 'ArrowLeft') {
         onIndex((index - 1 + images.length) % images.length);
       } else if (e.key === 'Tab') {
-        // trap focus within the dialog
+        // Trap focus within the dialog. Intercept from the CONTAINER itself too (not
+        // only at first/last), so focus can never land outside — if the active element
+        // isn't inside the dialog, or is the tabIndex=-1 container, wrap to an edge.
         const focusables = el?.querySelectorAll<HTMLElement>(
-          'button, [href], [tabindex]:not([tabindex="-1"])',
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
         );
         if (!focusables || focusables.length === 0) {
           e.preventDefault();
+          el?.focus();
           return;
         }
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
+        const active = document.activeElement as HTMLElement | null;
+        const inside = !!active && !!el && el.contains(active) && active !== el;
+        if (!inside) {
+          // focus escaped (or sits on the container) — pull it back to an edge.
+          e.preventDefault();
+          (e.shiftKey ? last : first).focus();
+        } else if (e.shiftKey && active === first) {
           e.preventDefault();
           last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
+        } else if (!e.shiftKey && active === last) {
           e.preventDefault();
           first.focus();
         }
@@ -155,6 +204,7 @@ function Lightbox({
     >
       <div className="absolute right-3 top-3 flex gap-2">
         <button
+          ref={closeRef}
           type="button"
           onClick={onClose}
           aria-label="Close gallery"

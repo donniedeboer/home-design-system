@@ -42,8 +42,12 @@
   --color-surface-3: #363430; /* pressed / stronger fill */
   --color-surface-inset: #161513; /* deepest inset */
 
-  --color-border: #343230;        /* hairline default */
-  --color-border-strong: #47453f; /* inputs, secondary buttons, dividers (>=3:1 non-text) */
+  --color-border: #343230;        /* hairline default — decorative rows/dividers only, NOT control edges */
+  --color-border-strong: #47453f; /* weighty dividers / decorative hairlines. NOT >=3:1 vs the surfaces
+                                     (only 1.30–1.80:1) — do NOT use as an interactive-control boundary. */
+  --color-border-control: #7f7d77; /* interactive-control boundary (secondary btn, inputs, composer,
+                                      feedback, inactive pills). WCAG 1.4.11 non-text >=3:1 vs ALL four
+                                      raised surfaces — computed: s0 3.77, s1 4.18, s2 3.38, s3 3.02. */
 
   --color-fg: #f5f4f1;        /* primary text */
   --color-fg-muted: #a8a6a0;  /* secondary text / labels */
@@ -52,13 +56,19 @@
   --color-overlay: rgb(0 0 0 / 0.5); /* modal / sheet backdrop */
 
   /* ---- PER-APP ACCENT (default = neutral slate — OVERRIDE PER APP) ----
-     accent-btn/-btn-hover = contrast-safe primary-button fill; -fg is the ink on
-     it. For indigo/amethyst these are darkened so white -fg clears 4.5 on both. */
+     accent-btn/-btn-hover = the primary-button fill; -fg is the ink on it. DEFAULT
+     is `var(--color-accent)`/`var(--color-accent-hover)`: a dark-ink override app
+     (pulse=emerald, scout=teal) that sets only --color-accent* gets its OWN accent
+     as the fill (var() substitution is lazy + scope-local) — AA-verified emerald
+     6.63/8.75, teal 6.80/9.09 with their dark accent-fg. Bright jewel tones
+     (indigo/amethyst) darken --color-accent-btn* explicitly for white ink (accents.ts).
+     Neutral fallback: white on #64748b(rest) = 4.76:1 (>=AA); registry-derived
+     neutral #576478/#617087 (>=5:1) is the AA-safe explicit pair. */
   --color-accent: #64748b;        /* brand signal */
   --color-accent-hover: #94a3b8;
-  --color-accent-btn: #64748b;    /* primary-button fill */
-  --color-accent-btn-hover: #94a3b8;
-  --color-accent-fg: #0b0f1a;     /* ink on the button fill */
+  --color-accent-btn: var(--color-accent);        /* primary-button fill — defaults to the accent */
+  --color-accent-btn-hover: var(--color-accent-hover);
+  --color-accent-fg: #ffffff;     /* ink on the button fill — white clears 4.5 on the neutral slate fill */
   --color-accent-subtle: #1e293b; /* active nav / chip-accent bg */
   --color-accent-muted: #334155;  /* chip fill / selection */
   --color-accent-text: #cbd5e1;   /* accent text / links / active-nav label */

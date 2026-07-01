@@ -40,7 +40,7 @@ export default function FeedbackWidget({ endpoint = '/api/feedback' }: { endpoin
           setOpen(true);
         }}
         aria-label="Send feedback"
-        className="fixed bottom-4 right-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-border-strong bg-surface-0 text-fg-muted shadow-pop transition-colors hover:text-fg"
+        className="fixed bottom-4 right-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-border-control bg-surface-0 text-fg-muted shadow-pop transition-colors hover:text-fg"
       >
         <span aria-hidden>✎</span>
       </button>
@@ -56,7 +56,7 @@ export default function FeedbackWidget({ endpoint = '/api/feedback' }: { endpoin
                 onChange={(e) => setText(e.target.value)}
                 rows={4}
                 placeholder="What's on your mind?"
-                className="mt-3 w-full rounded-lg border border-border-strong bg-surface-0 px-3 py-2 text-sm text-fg placeholder:text-fg-subtle focus-visible:border-[color:var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]"
+                className="mt-3 w-full rounded-lg border border-border-control bg-surface-0 px-3 py-2 text-sm text-fg placeholder:text-fg-subtle focus-visible:border-[color:var(--color-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]"
               />
               <div className="mt-3 flex justify-end gap-2">
                 <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>

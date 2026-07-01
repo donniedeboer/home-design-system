@@ -47,8 +47,12 @@
   --color-surface-3: #363430; /* pressed / stronger fill */
   --color-surface-inset: #161513; /* deepest inset (code, wells) */
 
-  --color-border: #343230;        /* hairline default */
-  --color-border-strong: #47453f; /* inputs, secondary buttons, weighty dividers (>=3:1 non-text) */
+  --color-border: #343230;        /* hairline default — decorative rows/dividers only, NOT control edges */
+  --color-border-strong: #47453f; /* weighty dividers / decorative hairlines. NOT >=3:1 vs the surfaces
+                                     (only 1.30–1.80:1) — do NOT use as an interactive-control boundary. */
+  --color-border-control: #7f7d77; /* interactive-control boundary (secondary btn, inputs, composer,
+                                      feedback, inactive pills). WCAG 1.4.11 non-text >=3:1 vs ALL four
+                                      raised surfaces — computed: s0 3.77, s1 4.18, s2 3.38, s3 3.02. */
 
   --color-fg: #f5f4f1;        /* primary text */
   --color-fg-muted: #a8a6a0;  /* secondary text / labels (AA on all surfaces) */
@@ -57,17 +61,26 @@
 
   --color-overlay: rgb(0 0 0 / 0.5); /* modal / sheet backdrop (was raw bg-zinc-950/40) */
 
-  /* ---- PER-APP ACCENT — override these 7 per app (default = neutral slate) ---
-     See the accent blocks at the bottom + accents.ts. accent-btn/accent-btn-hover
-     are the FILL BEHIND BUTTON TEXT: for indigo/amethyst they are darkened so the
-     white --color-accent-fg clears WCAG AA 4.5:1 on both fill AND hover; for the
-     dark-ink accents they equal --color-accent/-hover. --color-accent stays the
-     brand signal color (active-nav pill via subtle+text, links, ring). --------- */
+  /* ---- PER-APP ACCENT — override these 9 per app (default = neutral slate) ---
+     See the accent blocks at the bottom + accents.ts (the DERIVATION source).
+     accent-btn/accent-btn-hover are the FILL BEHIND BUTTON TEXT. The DEFAULT is
+     `var(--color-accent)`/`var(--color-accent-hover)`: a dark-ink override app
+     (pulse=emerald, scout=teal) that sets only --color-accent* automatically gets
+     its OWN accent as the button fill (CSS var() substitution is lazy + scope-local,
+     so it re-resolves at the app's scope) — computed AA: emerald 6.63/8.75, teal
+     6.80/9.09 with their dark accent-fg. Bright jewel tones (indigo/amethyst) are
+     too light for white ink, so THOSE apps darken --color-accent-btn* explicitly
+     (see accents.ts + the recipe comments below). --color-accent stays the brand
+     signal color (active-nav pill via subtle+text, links, ring).
+     The no-override NEUTRAL fallback wears WHITE ink on its own slate fill:
+     #ffffff on #64748b(rest) = 4.76:1 (>=AA 4.5). The registry's derived neutral
+     (accents.ts: #576478/#617087, both >=5:1) is the AA-safe explicit pair for any
+     app that pastes the neutral block verbatim. --------------------------------- */
   --color-accent: #64748b;        /* brand signal: active place, links, live cursor */
   --color-accent-hover: #94a3b8;  /* signal hover */
-  --color-accent-btn: #64748b;    /* primary-button fill (contrast-safe with -fg) */
-  --color-accent-btn-hover: #94a3b8;
-  --color-accent-fg: #0b0f1a;     /* ink on the button fill (clears 4.5 on -btn & -btn-hover) */
+  --color-accent-btn: var(--color-accent);        /* primary-button fill — defaults to the accent (see note) */
+  --color-accent-btn-hover: var(--color-accent-hover);
+  --color-accent-fg: #ffffff;     /* ink on the button fill — white clears 4.5 on the neutral slate fill */
   --color-accent-subtle: #1e293b; /* faint tint — active nav pill / chip-accent bg */
   --color-accent-muted: #334155;  /* chip fill / selection bg */
   --color-accent-text: #cbd5e1;   /* accent-colored text / links / active-nav label on dark */
@@ -171,31 +184,35 @@ table, input, .tabular { font-variant-numeric: tabular-nums; }
 /* ============================================================================
    PER-APP ACCENT OVERRIDES — copy ONE block into the app's own @theme{}. This is
    the only color an app changes. Data hues (macros, scores, per-kind chips) are
-   added LOCALLY per app and never reuse the accent. Values mirror accents.ts.
-   accent-btn/-fg are the contrast-safe primary-button pair (AA 4.5:1 verified).
+   added LOCALLY per app and never reuse the accent.
    ----------------------------------------------------------------------------
-   Omni (indigo):
+   The accent-btn / accent-btn-hover / accent-fg trio is DERIVED from the brand
+   `accent` by src/tokens/accents.ts (WCAG rule), not hand-tuned. Every ink×fill and
+   ink×hover-fill pair clears AA 4.5:1. WHITE-INK apps (bright jewel tones: indigo,
+   amethyst) MUST paste accent-btn/-btn-hover because their fill is darkened below the
+   brand color for white ink to pass. DARK-INK apps (emerald, teal, sky, amber) OMIT
+   accent-btn/-btn-hover — the default `--color-accent-btn: var(--color-accent)` makes
+   their own accent the fill (verified >=4.5 with their dark accent-fg). Regenerate:
+     node --experimental-strip-types scripts/check-accents.ts --css
+   ----------------------------------------------------------------------------
+   Omni (indigo · white ink · 6.03/5.04:1 — DARKENED fill, keep accent-btn):
      --color-accent:#6366f1; --color-accent-hover:#818cf8;
-     --color-accent-btn:#4f46e5; --color-accent-btn-hover:#5b52ea; --color-accent-fg:#ffffff;
+     --color-accent-btn:#474aee; --color-accent-btn-hover:#585bf0; --color-accent-fg:#ffffff;
      --color-accent-subtle:#1e1b4b; --color-accent-muted:#312e81; --color-accent-text:#a5b4fc; --color-ring:#818cf8;
-   Persona (amethyst):
+   Persona (amethyst · white ink · 6.01/5.02:1 — DARKENED fill, keep accent-btn):
      --color-accent:#8b5cf6; --color-accent-hover:#a78bfa;
-     --color-accent-btn:#7048d8; --color-accent-btn-hover:#7c4ff0; --color-accent-fg:#ffffff;
+     --color-accent-btn:#6f35f4; --color-accent-btn-hover:#7e4af5; --color-accent-fg:#ffffff;
      --color-accent-subtle:#2e1065; --color-accent-muted:#5b21b6; --color-accent-text:#c4b5fd; --color-ring:#a78bfa;
-   Pulse (emerald):
-     --color-accent:#10b981; --color-accent-hover:#34d399;
-     --color-accent-btn:#10b981; --color-accent-btn-hover:#34d399; --color-accent-fg:#04221a;
+   Pulse (emerald · deep-tint ink · 6.63/8.75:1 — fill = accent, OMIT accent-btn):
+     --color-accent:#10b981; --color-accent-hover:#34d399; --color-accent-fg:#04221a;
      --color-accent-subtle:#052e25; --color-accent-muted:#064e3b; --color-accent-text:#6ee7b7; --color-ring:#34d399;
-   Scout (teal):
-     --color-accent:#14b8a6; --color-accent-hover:#2dd4bf;
-     --color-accent-btn:#14b8a6; --color-accent-btn-hover:#2dd4bf; --color-accent-fg:#04211d;
+   Scout (teal · deep-tint ink · 6.80/9.09:1 — fill = accent, OMIT accent-btn):
+     --color-accent:#14b8a6; --color-accent-hover:#2dd4bf; --color-accent-fg:#04211d;
      --color-accent-subtle:#032725; --color-accent-muted:#0f766e; --color-accent-text:#5eead4; --color-ring:#2dd4bf;
-   go-links (sky):
-     --color-accent:#0ea5e9; --color-accent-hover:#38bdf8;
-     --color-accent-btn:#0ea5e9; --color-accent-btn-hover:#38bdf8; --color-accent-fg:#03192b;
+   go-links (sky · deep-tint ink · 6.14/7.94:1 — fill = accent, OMIT accent-btn):
+     --color-accent:#0ea5e9; --color-accent-hover:#38bdf8; --color-accent-fg:#031f2b;
      --color-accent-subtle:#0c2a3f; --color-accent-muted:#075985; --color-accent-text:#7dd3fc; --color-ring:#38bdf8;
-   devbot (amber):
-     --color-accent:#f59e0b; --color-accent-hover:#fbbf24;
-     --color-accent-btn:#f59e0b; --color-accent-btn-hover:#fbbf24; --color-accent-fg:#2a1a02;
-     --color-accent-subtle:#2a1a02; --color-accent-muted:#78500b; --color-accent-text:#fcd34d; --color-ring:#fbbf24;
+   devbot (amber · deep-tint ink · 7.67/9.87:1 — fill = accent, OMIT accent-btn):
+     --color-accent:#f59e0b; --color-accent-hover:#fbbf24; --color-accent-fg:#2c1c02;
+     --color-accent-subtle:#451a03; --color-accent-muted:#78350f; --color-accent-text:#fcd34d; --color-ring:#fbbf24;
    ============================================================================ */
