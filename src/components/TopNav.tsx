@@ -5,12 +5,6 @@ import { useRouter, isActivePath, type RouterAdapter } from '../router/RouterPro
 
 export type NavLink = { href: string; label: string; icon?: ReactNode };
 
-const MAXW: Record<'3xl' | '5xl' | 'full', string> = {
-  '3xl': 'max-w-3xl',
-  '5xl': 'max-w-5xl',
-  full: 'max-w-none',
-};
-
 function initials(name: string): string {
   const p = name.trim().split(/[\s·]+/).filter(Boolean);
   const s = ((p[0]?.[0] ?? '') + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase();
@@ -54,7 +48,6 @@ export default function TopNav({
   links = [],
   actions,
   identity,
-  maxWidth = '3xl',
   glyph = 'module',
   router,
 }: {
@@ -66,6 +59,8 @@ export default function TopNav({
   actions?: ReactNode;
   /** the authenticated identity: a display name (renders the standard chip) or a node. */
   identity?: string | ReactNode;
+  /** @deprecated ignored — the nav bar is ALWAYS full-width (logo left, identity right)
+   * so it looks the same across the suite regardless of the content max-width. */
   maxWidth?: '3xl' | '5xl' | 'full';
   glyph?: AppGlyphName;
   router?: RouterAdapter;
@@ -75,7 +70,7 @@ export default function TopNav({
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-surface-0/85 backdrop-blur-md">
-      <nav className={`mx-auto flex ${MAXW[maxWidth]} h-14 items-center gap-1 px-4 text-sm`}>
+      <nav className="flex h-14 w-full items-center gap-1 px-4 text-sm">
         <Link href="/" className="mr-3 flex items-center gap-2.5 text-fg">
           <Logo className="h-8 w-8 shrink-0" glyph={glyph} />
           <span className="flex min-w-0 flex-col leading-tight">
