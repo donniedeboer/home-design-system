@@ -55,7 +55,11 @@ export default function Modal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 backdrop-blur-sm"
+        style={{ background: 'var(--color-overlay)' }}
+        onClick={onClose}
+      />
       <div className="relative z-10 max-h-[92vh] w-full overflow-y-auto rounded-t-2xl border border-border bg-surface-0 shadow-pop sm:max-w-2xl sm:rounded-2xl">
         <div className="mx-auto mt-2 h-1 w-9 rounded-full bg-border-strong sm:hidden" />
         {children}
