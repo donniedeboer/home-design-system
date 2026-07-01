@@ -36,6 +36,7 @@ export {
   type ChatStreamEvent,
 } from './chat/AgentChat';
 export { parseWidgetProtocol, type ChatSegment } from './chat/parseWidgetProtocol';
+export { default as Markdown, type MarkdownProps } from './chat/Markdown';
 
 // ── Widgets ──────────────────────────────────────────────────────────────────
 export { default as MovieCard } from './widgets/MovieCard';

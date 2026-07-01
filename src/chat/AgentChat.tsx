@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { parseWidgetProtocol, type ChatSegment } from './parseWidgetProtocol';
+import Markdown from './Markdown';
 import { Widget } from '../widgets/registry';
 import type { WidgetDescriptor, WidgetAction } from '../widgets/types';
 
@@ -213,9 +214,7 @@ function AssistantTurn({
       <div className="space-y-3">
         {segments.map((seg) =>
           seg.kind === 'prose' ? (
-            <p key={seg.key} className="whitespace-pre-wrap text-[15px] leading-[1.6] text-fg">
-              {seg.text}
-            </p>
+            <Markdown key={seg.key}>{seg.text}</Markdown>
           ) : (
             <div key={seg.key}>
               {renderWidget
