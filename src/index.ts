@@ -17,7 +17,7 @@ export {
 
 // ── Shell & nav ──────────────────────────────────────────────────────────────
 export { default as AppShell } from './components/AppShell';
-export { default as TopNav, type NavLink } from './components/TopNav';
+export { default as TopNav, IdentityChip, type NavLink } from './components/TopNav';
 export { default as SideNav, type NavSection } from './components/SideNav';
 
 // ── Chrome primitives ────────────────────────────────────────────────────────

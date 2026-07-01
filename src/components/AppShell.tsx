@@ -1,8 +1,6 @@
 'use client';
 import type { ComponentType, ReactNode } from 'react';
 import { RouterProvider, type RouterAdapter } from '../router/RouterProvider';
-import ProfileProvider from './ProfileProvider';
-import ProfileSwitcher from './ProfileSwitcher';
 import TopNav, { type NavLink } from './TopNav';
 import SideNav, { type NavSection } from './SideNav';
 import type { AppGlyphName } from './Logo';
@@ -14,62 +12,59 @@ const MAINW: Record<'3xl' | '5xl' | 'full', string> = {
 };
 
 /**
- * The composition root every app shares. Injects the RouterAdapter once, wraps
- * ProfileProvider, and renders TopNav + optional SideNav + <main>. ONE `maxWidth`
- * lever is applied to BOTH nav and main (fixes nav/content misalignment).
+ * The composition root EVERY app shares. Injects the RouterAdapter once and renders the
+ * one shared TopNav + optional SideNav + <main>. ONE `maxWidth` lever aligns nav + main.
  *
- * Two supported layouts (SideNav is OPTIONAL):
- *   (a) TopNav + left SideNav + main   — pass `sideNav` (Omni pattern).
- *   (b) TopNav-with-top-tabs + main with app-provided side panes — omit `sideNav`,
- *       put the app's panes inside `children` (Persona pattern). `topLinks` render
- *       as the top tabs.
+ * OPINIONATED identity: the nav shows a READ-ONLY authenticated-identity chip from the
+ * `identity` prop (a display name). There is NO profile picker — every app resolves its
+ * signed-in identity (Tailscale-derived) and passes the name here, so identity looks and
+ * sits the same across the suite. Apps that need profile DATA context can still wrap their
+ * own provider via `provider`; it must not add a picker to the chrome.
  *
- * Centered chat column (Omni): `maxWidth` bounds the shell frame; the chat column
- * centers itself WITHIN <main> with its own narrower max (e.g. mx-auto max-w-2xl),
- * so the shell lever and the reading column stay independent.
- *
- * `right` defaults to <ProfileSwitcher/> (mounts only when a profile is active).
- * Pass `profileCookieName={null}` to skip the ProfileProvider entirely (utilities).
+ * Layouts (SideNav optional): (a) TopNav + left SideNav + main (pass `sideNav`); (b)
+ * TopNav-with-top-tabs + main with app panes in `children` (pass `topLinks`).
  */
 export default function AppShell({
   appName,
+  subtitle,
   router,
   glyph = 'module',
   topLinks = [],
+  actions,
+  identity,
   sideNav,
   sideNavCollapsed = false,
   sideNavFooter,
   maxWidth = '3xl',
-  right,
-  profileCookieName = 'app_profile',
   provider,
   children,
 }: {
   appName: string;
+  /** the app's tagline (e.g. "your family assistant") shown under the name in the nav. */
+  subtitle?: string;
   router: RouterAdapter;
   glyph?: AppGlyphName;
   topLinks?: NavLink[];
+  /** app-specific right-side nav actions (share/settings/model pill) — before identity. */
+  actions?: ReactNode;
+  /** the authenticated identity display name (or a node) — renders the uniform chip. */
+  identity?: string | ReactNode;
   sideNav?: NavSection[];
   sideNavCollapsed?: boolean;
   sideNavFooter?: ReactNode;
   maxWidth?: '3xl' | '5xl' | 'full';
-  /** TopNav right slot; defaults to <ProfileSwitcher/>. Pass `null` to render nothing. */
-  right?: ReactNode | null;
-  /** per-app profile cookie (host-scoped; must be unique). `null` disables profiles. */
-  profileCookieName?: string | null;
   /** optional child-wrapper (e.g. an app-local data provider). */
   provider?: ComponentType<{ children: ReactNode }>;
   children: ReactNode;
 }) {
-  const hasProfiles = profileCookieName != null;
-  const rightSlot = right === null ? undefined : right ?? (hasProfiles ? <ProfileSwitcher /> : undefined);
-
   const shell = (
     <div className="flex min-h-screen flex-col">
       <TopNav
         appName={appName}
+        subtitle={subtitle}
         links={topLinks}
-        right={rightSlot}
+        actions={actions}
+        identity={identity}
         maxWidth={maxWidth}
         glyph={glyph}
       />
@@ -83,13 +78,7 @@ export default function AppShell({
   );
 
   const withProvider = provider ? withComponent(provider, shell) : shell;
-  const withProfiles = hasProfiles ? (
-    <ProfileProvider cookieName={profileCookieName as string}>{withProvider}</ProfileProvider>
-  ) : (
-    withProvider
-  );
-
-  return <RouterProvider adapter={router}>{withProfiles}</RouterProvider>;
+  return <RouterProvider adapter={router}>{withProvider}</RouterProvider>;
 }
 
 function withComponent(Provider: ComponentType<{ children: ReactNode }>, children: ReactNode) {

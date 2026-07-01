@@ -112,10 +112,12 @@ export default function Logo({
   glyph?: AppGlyphName | ReactNode;
 }) {
   const inner = typeof glyph === 'string' ? glyphs[glyph as AppGlyphName] ?? glyphs.module : glyph;
+  // Inset the 24-grid glyph to ~72% so every mark sits with consistent padding
+  // inside its accent tile (translate = (24 - 24*0.72)/2). One ratio, all apps.
   return (
     <svg viewBox="0 0 24 24" className={className} role="img" aria-label="App icon">
       <rect width="24" height="24" rx="6" fill="var(--color-accent)" />
-      {inner}
+      <g transform="translate(3.36 3.36) scale(0.72)">{inner}</g>
     </svg>
   );
 }
