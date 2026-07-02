@@ -1,17 +1,20 @@
 'use client';
 import type { MovieData, WidgetProps } from './types';
 import ReactionBar from './ReactionBar';
-import { FitChip, WhyLine, ReasoningBlock } from './Reasoning';
+import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
 
 /**
  * MovieCard — compact = boxshot (62×92) + title/year + why/fit + rating pill; full =
  * larger poster + notes/who + synthesized-fit reasoning + thumbs-with-note. The rating
  * pill is a DATA display (amber star ink on a neutral fill, NEVER the app accent) —
- * reactions are the thumbs, not the stars.
+ * reactions are the thumbs, not the stars. Research transparency: compact shows a
+ * "n/m researched" chip, full a ✓/○ dimension row; tier 'triage' mutes the fit ("~").
  */
 export default function MovieCard({ data, variant = 'compact', onAction }: WidgetProps<MovieData>) {
   const year = data.year ? ` (${data.year})` : '';
   const rating = typeof data.rating === 'number' ? Math.max(0, Math.min(5, data.rating)) : undefined;
+  // tier 'triage' = provisional listing-native rank: the fit verdict renders muted with a "~".
+  const provisional = data.tier === 'triage';
 
   const RatingPill = rating != null ? (
     <span
@@ -40,7 +43,8 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
           <WhyLine why={data.why} className="mt-0.5" />
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {RatingPill}
-            <FitChip fit={data.fit} />
+            <FitChip fit={data.fit} provisional={provisional} />
+            <ResearchChip research={data.research} />
           </div>
         </div>
       </div>
@@ -60,7 +64,8 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
           {data.notes && (
             <p className="mt-2 text-[15px] leading-[1.6] text-fg">{data.notes}</p>
           )}
-          <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} />
+          <ResearchRow research={data.research} className="mt-2" />
+          <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} provisional={provisional} />
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {RatingPill}
             {onAction && (

@@ -1,14 +1,26 @@
 'use client';
-import type { FitVerdict } from './types';
+import type { FitVerdict, ResearchDim } from './types';
 import { Chip } from '../components/data';
 
 /**
  * Reasoning — the shared synthesized-perspective slices for item cards (ListingCard /
  * MovieCard / DynamicCard): a fit-verdict Chip (DATA hues), the compact one-line `why`,
- * and the full-variant block (fit chip + why paragraph + pros/cons columns + advice).
+ * the full-variant block (fit chip + why paragraph + pros/cons columns + advice), and
+ * the research-transparency chips (compact "n/m researched" / full ✓/○ dimension row).
  * Every read is defensive — a missing or malformed field renders nothing, never throws
  * (a thrown widget would take down the whole chat surface).
  */
+
+/** Hard clamp on rendered research dimensions (matches the layout-DSL chip clamps). */
+export const MAX_RESEARCH_DIMS = 6;
+
+/** Defensive read: keep only well-formed { label, done } entries, clamped to 6. */
+export function researchDims(research?: ResearchDim[]): ResearchDim[] {
+  if (!Array.isArray(research)) return [];
+  return research
+    .filter((d): d is ResearchDim => !!d && typeof d === 'object' && typeof d.label === 'string' && !!d.label.trim())
+    .slice(0, MAX_RESEARCH_DIMS);
+}
 
 /** fit verdict → data hue; anything unrecognized → undefined (chip simply doesn't show). */
 export function fitTone(fit?: string): 'success' | 'warning' | 'danger' | undefined {
@@ -33,11 +45,62 @@ function asStrs(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((s): s is string => typeof s === 'string' && !!s.trim()) : [];
 }
 
-/** FitChip — the verdict pill ("Strong fit"); unknown/missing verdicts render nothing. */
-export function FitChip({ fit }: { fit?: FitVerdict }) {
+/**
+ * FitChip — the verdict pill ("Strong fit"); unknown/missing verdicts render nothing.
+ * `provisional` (tier === 'triage') mutes the chip to neutral and prefixes "~" — the
+ * verdict came from the cheap triage pass, not the full deep-dive.
+ */
+export function FitChip({ fit, provisional }: { fit?: FitVerdict; provisional?: boolean }) {
   const tone = fitTone(fit);
   if (!tone || !fit) return null;
-  return <Chip tone={tone}>{fit.charAt(0).toUpperCase() + fit.slice(1)} fit</Chip>;
+  const label = `${fit.charAt(0).toUpperCase() + fit.slice(1)} fit`;
+  if (provisional) {
+    return (
+      <Chip tone="neutral">
+        <span className="italic opacity-80">~{label}</span>
+      </Chip>
+    );
+  }
+  return <Chip tone={tone}>{label}</Chip>;
+}
+
+/**
+ * ResearchChip — the compact-variant progress pill ("2/4 researched"). Renders nothing
+ * when `research` is absent/empty, so cards without the feature are unchanged.
+ */
+export function ResearchChip({ research }: { research?: ResearchDim[] }) {
+  const dims = researchDims(research);
+  if (dims.length === 0) return null;
+  const done = dims.filter((d) => d.done).length;
+  return (
+    <Chip tone="neutral">
+      {done}/{dims.length} researched
+    </Chip>
+  );
+}
+
+/**
+ * ResearchRow — the full-variant per-dimension chip row: done → success "✓ Risk",
+ * pending → neutral muted "○ Schools". Clamped to 6 dims; renders nothing when absent.
+ */
+export function ResearchRow({ research, className = '' }: { research?: ResearchDim[]; className?: string }) {
+  const dims = researchDims(research);
+  if (dims.length === 0) return null;
+  return (
+    <div className={`flex flex-wrap items-center gap-1.5 ${className}`}>
+      {dims.map((d, i) =>
+        d.done ? (
+          <Chip key={i} tone="success">
+            ✓ {d.label}
+          </Chip>
+        ) : (
+          <Chip key={i} tone="neutral">
+            <span className="opacity-70">○ {d.label}</span>
+          </Chip>
+        ),
+      )}
+    </div>
+  );
 }
 
 /** WhyLine — the compact one-liner: truncated, italic, muted. */
@@ -69,12 +132,15 @@ export function ReasoningBlock({
   pros,
   cons,
   advice,
+  provisional,
 }: {
   fit?: FitVerdict;
   why?: string;
   pros?: string[];
   cons?: string[];
   advice?: string;
+  /** triage-tier item — the fit verdict renders muted with a "~" (not deep-researched yet). */
+  provisional?: boolean;
 }) {
   const whyText = asStr(why);
   const adviceText = asStr(advice);
@@ -86,7 +152,7 @@ export function ReasoningBlock({
     <div className="mt-3 space-y-2">
       {tone && (
         <div>
-          <FitChip fit={fit} />
+          <FitChip fit={fit} provisional={provisional} />
         </div>
       )}
       {whyText && <p className="text-[15px] leading-[1.6] text-fg">{whyText}</p>}

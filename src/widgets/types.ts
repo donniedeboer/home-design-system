@@ -15,6 +15,22 @@ export type Reaction = 'up' | 'down';
 /** Synthesized fit verdict — strong/good render success, mixed warning, weak danger (DATA hues). */
 export type FitVerdict = 'strong' | 'good' | 'mixed' | 'weak';
 
+/**
+ * One research dimension's status — the label is spec-authored and domain-generic
+ * ("Aesthetics (photos)" for houses, "Ratings" for movies); `done` means the deep-dive
+ * for that dimension has actually run for THIS item.
+ */
+export interface ResearchDim {
+  label: string;
+  done: boolean;
+}
+
+/**
+ * Research tier — 'vetted' = fully researched/deep-scored; 'triage' = provisional
+ * listing-native rank only (scores render muted with a "~" prefix).
+ */
+export type ResearchTier = 'vetted' | 'triage';
+
 export interface MovieData {
   id?: string;
   title: string;
@@ -36,6 +52,10 @@ export interface MovieData {
   advice?: string;
   /** persisted thumb reaction (drives the reaction bar's selected state). */
   reaction?: Reaction;
+  /** per-dimension research status (compact: "n/m researched" chip; full: ✓/○ chip row). */
+  research?: ResearchDim[];
+  /** 'vetted' = deep-researched score; 'triage' = provisional (score/fit render muted "~"). */
+  tier?: ResearchTier;
 }
 
 export interface ListingData {
@@ -68,6 +88,10 @@ export interface ListingData {
   advice?: string;
   /** persisted thumb reaction (drives the reaction bar's selected state). */
   reaction?: Reaction;
+  /** per-dimension research status (compact: "n/m researched" chip; full: ✓/○ chip row). */
+  research?: ResearchDim[];
+  /** 'vetted' = deep-researched score; 'triage' = provisional (score/fit render muted "~"). */
+  tier?: ResearchTier;
 }
 
 export interface ChecklistItem {
@@ -193,6 +217,10 @@ export interface DynamicData {
   advice?: string;
   /** persisted thumb reaction (drives the reaction bar's selected state). */
   reaction?: Reaction;
+  /** per-dimension research status (compact: "n/m researched" chip; full: ✓/○ chip row). */
+  research?: ResearchDim[];
+  /** 'vetted' = deep-researched score; 'triage' = provisional (score/fit render muted "~"). */
+  tier?: ResearchTier;
 }
 
 export type WidgetDescriptor =
