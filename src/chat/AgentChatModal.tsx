@@ -13,7 +13,7 @@ import type { WidgetDescriptor, WidgetAction } from '../widgets/types';
  * actions are handled + how app-local widget types render.
  *
  * The system prompt is resolved SERVER-SIDE from `scopeKey` (Scout: "search:<id>",
- * Persona: "entity:<e>"), so the client never carries it. Accept/Dismiss + love/pass
+ * Persona: "entity:<e>"), so the client never carries it. Accept/Dismiss + up/down
  * round-trip through the same session as an ordinary turn (the server's route applies the
  * write via its on_accept), unless the app overrides `onWidgetAction`.
  */

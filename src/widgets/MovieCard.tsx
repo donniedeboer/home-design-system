@@ -1,10 +1,13 @@
 'use client';
 import type { MovieData, WidgetProps } from './types';
+import ReactionBar from './ReactionBar';
+import { FitChip, WhyLine, ReasoningBlock } from './Reasoning';
 
 /**
- * MovieCard — compact = boxshot (62×92) + title/year + rating pill; full = larger
- * poster + notes/who + a rating control. The rating pill uses a DATA hue (amber
- * star ink on a neutral fill), NEVER the app accent.
+ * MovieCard — compact = boxshot (62×92) + title/year + why/fit + rating pill; full =
+ * larger poster + notes/who + synthesized-fit reasoning + thumbs-with-note. The rating
+ * pill is a DATA display (amber star ink on a neutral fill, NEVER the app accent) —
+ * reactions are the thumbs, not the stars.
  */
 export default function MovieCard({ data, variant = 'compact', onAction }: WidgetProps<MovieData>) {
   const year = data.year ? ` (${data.year})` : '';
@@ -34,7 +37,11 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
               {data.status === 'watched' ? 'Watched' : 'Watchlist'}
             </div>
           )}
-          <div className="mt-1.5">{RatingPill}</div>
+          <WhyLine why={data.why} className="mt-0.5" />
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {RatingPill}
+            <FitChip fit={data.fit} />
+          </div>
         </div>
       </div>
     );
@@ -53,22 +60,11 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
           {data.notes && (
             <p className="mt-2 text-[15px] leading-[1.6] text-fg">{data.notes}</p>
           )}
-          <div className="mt-3 flex items-center gap-2">
+          <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} />
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {RatingPill}
             {onAction && (
-              <div className="flex items-center gap-1" role="group" aria-label="Rate this movie">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => onAction(`rate movie ${data.title} ${n}`)}
-                    aria-label={`Rate ${n} star${n > 1 ? 's' : ''}`}
-                    className="relative flex h-7 min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-fg-subtle transition-colors hover:text-warning"
-                  >
-                    <span aria-hidden className={rating != null && n <= rating ? 'text-warning' : ''}>★</span>
-                  </button>
-                ))}
-              </div>
+              <ReactionBar kind="movie" id={data.id ?? data.title} reaction={data.reaction} onAction={onAction} />
             )}
             {data.url && (
               <a

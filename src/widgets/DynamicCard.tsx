@@ -3,6 +3,8 @@ import type { DynamicData, DynamicBadge, DynamicChip, FieldRef, WidgetProps } fr
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import { evalPredicate, formatValue, getField, MAX_STATS, MAX_CHIPS, MAX_BADGES, type ItemBag } from './dynamicLayout';
+import ReactionBar from './ReactionBar';
+import { FitChip, WhyLine, ReasoningBlock, fitTone } from './Reasoning';
 
 /**
  * DynamicCard [dyn] — renders an agent-authored declarative layout (DynamicLayout) for a
@@ -59,11 +61,15 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
   const body = bodyText && bodyText !== '—' ? bodyText : undefined;
   const mediaUrl =
     layout.media && typeof layout.media === 'object' ? safeUrl(getField(bag, layout.media.field) as string | undefined) : undefined;
-  const actions = asArr<'love' | 'pass' | 'rate' | 'open'>(layout.actions);
+  const actions = asArr<'up' | 'down' | 'love' | 'pass' | 'rate' | 'open'>(layout.actions);
+  // 'love'/'pass' are LEGACY aliases for 'up'/'down' — any of the four renders the thumbs (+ note).
+  const wantsThumbs = actions.some((a) => a === 'up' || a === 'down' || a === 'love' || a === 'pass');
   const openHref = safeUrl(data.scoutUrl ?? data.url);
+  const why = typeof data?.why === 'string' && data.why.trim() ? data.why : undefined;
+  const showFit = fitTone(data?.fit) != null;
 
   const populated =
-    (title ? 1 : 0) + (subtitle ? 1 : 0) + (stats.length ? 1 : 0) + (chips.length ? 1 : 0) + (body ? 1 : 0) + (mediaUrl ? 1 : 0);
+    (title ? 1 : 0) + (subtitle ? 1 : 0) + (stats.length ? 1 : 0) + (chips.length ? 1 : 0) + (body ? 1 : 0) + (mediaUrl ? 1 : 0) + (why ? 1 : 0);
 
   // Minimum-viability — never a near-blank tile.
   if (populated < 2) {
@@ -107,10 +113,12 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
         <div className="min-w-0 flex-1 py-2.5 pr-3">
           {title && <div className="truncate text-sm font-semibold text-fg">{title}</div>}
           {subtitle && <div className="truncate text-[11px] text-fg-muted">{subtitle}</div>}
-          {(badges.length > 0 || chips.length > 0) && (
+          <WhyLine why={why} className="mt-0.5" />
+          {(badges.length > 0 || chips.length > 0 || showFit) && (
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               {badgeRow}
               {chipRow}
+              <FitChip fit={data?.fit} />
             </div>
           )}
         </div>
@@ -148,18 +156,10 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
           </div>
         )}
         {body && <p className="mt-3 text-[15px] leading-[1.6] text-fg">{body}</p>}
+        <ReasoningBlock fit={data?.fit} why={why} pros={data?.pros} cons={data?.cons} advice={data?.advice} />
         {onAction && actions.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {actions.includes('love') && (
-              <Button variant="primary" size="sm" onClick={() => onAction(`love item ${itemId}`)}>
-                Loved
-              </Button>
-            )}
-            {actions.includes('pass') && (
-              <Button variant="secondary" size="sm" onClick={() => onAction(`pass item ${itemId}`)}>
-                Pass
-              </Button>
-            )}
+            {wantsThumbs && <ReactionBar kind="item" id={itemId} reaction={data?.reaction} onAction={onAction} />}
             {actions.includes('rate') && (
               <div className="flex items-center gap-0.5" role="group" aria-label="Rate">
                 {[1, 2, 3, 4, 5].map((n) => (

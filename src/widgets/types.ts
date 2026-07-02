@@ -9,17 +9,33 @@
 
 export type WidgetVariant = 'compact' | 'full';
 
+/** A thumb reaction — the persisted state behind the up/down pair on item cards. */
+export type Reaction = 'up' | 'down';
+
+/** Synthesized fit verdict — strong/good render success, mixed warning, weak danger (DATA hues). */
+export type FitVerdict = 'strong' | 'good' | 'mixed' | 'weak';
+
 export interface MovieData {
   id?: string;
   title: string;
   year?: number;
   poster_url?: string;
   status?: 'watched' | 'watchlist';
-  rating?: number; // 0..5 (data hue, never the accent)
+  rating?: number; // 0..5 (data hue, never the accent) — a DISPLAY, not a reaction control
   who?: string;
   notes?: string;
   watched_at?: string;
   url?: string;
+  /** one-line synthesized fit summary (compact: truncated italic line). */
+  why?: string;
+  /** overall fit verdict (renders as a data-hue chip). */
+  fit?: FitVerdict;
+  pros?: string[];
+  cons?: string[];
+  /** one-line recommendation (full variant: final emphasized line). */
+  advice?: string;
+  /** persisted thumb reaction (drives the reaction bar's selected state). */
+  reaction?: Reaction;
 }
 
 export interface ListingData {
@@ -42,6 +58,16 @@ export interface ListingData {
   photo_url?: string; // CDN hero (representative preview; safe off-tailnet)
   photos?: string[]; // full gallery (tailnet-only Scout route)
   summary?: string;
+  /** one-line synthesized fit summary (compact: truncated italic line). */
+  why?: string;
+  /** overall fit verdict (renders as a data-hue chip). */
+  fit?: FitVerdict;
+  pros?: string[];
+  cons?: string[];
+  /** one-line recommendation (full variant: final emphasized line). */
+  advice?: string;
+  /** persisted thumb reaction (drives the reaction bar's selected state). */
+  reaction?: Reaction;
 }
 
 export interface ChecklistItem {
@@ -142,13 +168,14 @@ export interface DynamicLayout {
   chips?: DynamicChip[]; // clamped to 4
   badges?: DynamicBadge[];
   body?: FieldRef;
-  actions?: Array<'love' | 'pass' | 'rate' | 'open'>;
+  /** 'love'/'pass' are LEGACY aliases for 'up'/'down' — both render the thumbs pair (+ note). */
+  actions?: Array<'up' | 'down' | 'love' | 'pass' | 'rate' | 'open'>;
 }
 
 /** The `data` payload for a `dynamic` widget: a layout + the item's normalized field bag. */
 export interface DynamicData {
   id?: string;
-  /** stable id used to round-trip love/pass/rate commands (e.g. the candidate id). */
+  /** stable id used to round-trip up/down/rate commands (e.g. the candidate id). */
   itemId: string;
   layout: DynamicLayout;
   item: Record<string, string | number | boolean | null | undefined>;
@@ -156,6 +183,16 @@ export interface DynamicData {
   url?: string;
   /** in-platform link for the `open` action (preferred over `url`). */
   scoutUrl?: string;
+  /** one-line synthesized fit summary (compact: truncated italic line). */
+  why?: string;
+  /** overall fit verdict (renders as a data-hue chip). */
+  fit?: FitVerdict;
+  pros?: string[];
+  cons?: string[];
+  /** one-line recommendation (full variant: final emphasized line). */
+  advice?: string;
+  /** persisted thumb reaction (drives the reaction bar's selected state). */
+  reaction?: Reaction;
 }
 
 export type WidgetDescriptor =
@@ -171,7 +208,18 @@ export type WidgetDescriptor =
 
 export type WidgetType = WidgetDescriptor['type'];
 
-/** Interaction callback: widgets round-trip a compact command string as the next chat message. */
+/**
+ * Interaction callback: widgets round-trip a compact command string as the next chat message.
+ *
+ * Reaction command grammar (every interactive item card):
+ *   `up <kind> <id>` / `down <kind> <id>`     — a thumb alone
+ *   `up <kind> <id> | <note>`                 — a thumb WITH a free-text note (pipe-separated)
+ * kind = 'listing' (ListingCard, id = propertyId) | 'movie' (MovieCard, id = id ?? title)
+ *      | 'item' (DynamicCard, id = itemId). `love`/`pass` are LEGACY aliases for up/down —
+ * still accepted in DynamicLayout.actions, but cards only EMIT up/down.
+ * Ratings: DynamicCard's `rate` verb still emits `rate item <id> <n>`; MovieCard's rating is
+ * now a display only (no `rate movie …` emission).
+ */
 export type WidgetAction = (message: string) => void;
 
 /** Common prop shape every widget component accepts. */

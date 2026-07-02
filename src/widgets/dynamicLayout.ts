@@ -11,7 +11,9 @@ import type { DynamicLayout, FieldRef, DynamicFieldFormat } from './types';
 
 export const FIELD_FORMATS: readonly DynamicFieldFormat[] = ['usd', 'number', 'date', 'percent', 'text'];
 export const BADGE_HUES = ['success', 'warning', 'danger'] as const;
-export const ACTION_VERBS = ['love', 'pass', 'rate', 'open'] as const;
+// 'love'/'pass' are LEGACY aliases for 'up'/'down' — still valid in agent-authored
+// layouts, but DynamicCard renders any of the four as the thumbs pair (+ note).
+export const ACTION_VERBS = ['up', 'down', 'love', 'pass', 'rate', 'open'] as const;
 export const MAX_STATS = 6;
 export const MAX_CHIPS = 4;
 export const MAX_BADGES = 4;

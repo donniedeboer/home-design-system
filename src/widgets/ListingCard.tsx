@@ -3,16 +3,18 @@ import type { ListingData, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import Gallery from './Gallery';
+import ReactionBar from './ReactionBar';
+import { FitChip, WhyLine, ReasoningBlock } from './Reasoning';
 
 function money(n?: number): string | undefined {
   return n == null ? undefined : `$${n.toLocaleString('en-US')}`;
 }
 
 /**
- * ListingCard [I] — compact = CDN hero + address + one meta line + price + drop/fit
- * chips, click-through (the calmer representative preview); full = hero + gallery
- * rail + DataGrid spec grid + summary + Loved/Pass/Open-in-Scout. Score/drop use
- * DATA hues (success/danger/neutral), never the accent.
+ * ListingCard [I] — compact = CDN hero + address + one meta line + why/fit + price +
+ * drop chips, click-through (the calmer representative preview); full = hero + gallery
+ * rail + DataGrid spec grid + summary + synthesized-fit reasoning + thumbs-with-note +
+ * Open-in-Scout. Score/drop/fit use DATA hues (success/danger/neutral), never the accent.
  */
 export default function ListingCard({ data, variant = 'compact', onAction }: WidgetProps<ListingData>) {
   const price = money(data.price);
@@ -42,9 +44,11 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
           <div className="truncate text-sm font-semibold text-fg">{data.address}</div>
           {cityLine && <div className="truncate text-[11px] text-fg-muted">{cityLine}</div>}
           {metaLine && <div className="mt-0.5 text-[11px] text-fg-subtle">{metaLine}</div>}
+          <WhyLine why={data.why} className="mt-0.5" />
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {price && <span className="text-sm font-semibold tabular-nums text-fg">{price}</span>}
             {chips}
+            <FitChip fit={data.fit} />
           </div>
         </div>
       </div>
@@ -93,14 +97,11 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
 
         {data.summary && <p className="mt-3 text-[15px] leading-[1.6] text-fg">{data.summary}</p>}
 
+        <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} />
+
         {onAction && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button variant="primary" size="sm" onClick={() => onAction(`love listing ${data.propertyId}`)}>
-              Loved
-            </Button>
-            <Button variant="secondary" size="sm" onClick={() => onAction(`pass listing ${data.propertyId}`)}>
-              Pass
-            </Button>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <ReactionBar kind="listing" id={data.propertyId} reaction={data.reaction} onAction={onAction} />
             {data.scoutUrl && (
               <Button as="a" href={data.scoutUrl} target="_blank" rel="noreferrer" variant="ghost" size="sm">
                 Open in Scout

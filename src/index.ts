@@ -90,6 +90,8 @@ export {
   type WidgetDescriptor,
   type WidgetProps,
   type WidgetAction,
+  type Reaction,
+  type FitVerdict,
   type MovieData,
   type ListingData,
   type ChecklistData,
