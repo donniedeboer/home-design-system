@@ -287,7 +287,7 @@ function Composer({
           onClick={submit}
           disabled={busy || !value.trim()}
           aria-label="Send message"
-          className="flex h-9 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[color:var(--color-accent-btn)] px-3 text-[color:var(--color-accent-fg)] transition-colors hover:bg-[color:var(--color-accent-btn-hover)] disabled:opacity-40"
+          className="relative flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full bg-[color:var(--color-accent-btn)] text-[15px] text-[color:var(--color-accent-fg)] transition-colors hover:bg-[color:var(--color-accent-btn-hover)] disabled:opacity-40 [@media(pointer:coarse)]:before:absolute [@media(pointer:coarse)]:before:left-1/2 [@media(pointer:coarse)]:before:top-1/2 [@media(pointer:coarse)]:before:h-11 [@media(pointer:coarse)]:before:w-11 [@media(pointer:coarse)]:before:-translate-x-1/2 [@media(pointer:coarse)]:before:-translate-y-1/2 [@media(pointer:coarse)]:before:content-['']"
         >
           <span aria-hidden>↑</span>
         </button>
