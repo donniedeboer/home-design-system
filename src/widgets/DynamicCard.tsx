@@ -1,42 +1,66 @@
 'use client';
-import type { DynamicData, WidgetProps } from './types';
+import type { DynamicData, DynamicBadge, DynamicChip, FieldRef, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
-import { evalPredicate, formatValue, MAX_STATS, MAX_CHIPS, type ItemBag } from './dynamicLayout';
+import { evalPredicate, formatValue, getField, MAX_STATS, MAX_CHIPS, MAX_BADGES, type ItemBag } from './dynamicLayout';
 
 /**
  * DynamicCard [dyn] — renders an agent-authored declarative layout (DynamicLayout) for a
  * domain with no hand-built widget. It NEVER runs code: closed-vocabulary slots map to
  * primitives (Chip / DataGrid / Button), values format through the fixed enum, and badges
- * are gated by the safe predicate DSL. Missing/empty slots are dropped; if fewer than two
- * slots populate it downgrades to a plain row rather than render a near-blank tile.
+ * are gated by the safe predicate DSL. Every read is defensive — non-array slots, non-object
+ * refs, prototype-chain field names, and unsafe URLs are all handled without throwing, so a
+ * malformed agent widget can never crash the surrounding chat surface. Missing/empty slots
+ * are dropped; fewer than two populated slots downgrades to a plain row, not a blank tile.
  */
+
+function asArr<T>(x: unknown): T[] {
+  return Array.isArray(x) ? (x as T[]) : [];
+}
+
+/** Allow only http(s), root/relative, and hash hrefs — block javascript:/data: and other schemes. */
+function safeUrl(u?: string): string | undefined {
+  if (!u) return undefined;
+  const s = String(u).trim();
+  if (/^(https?:\/\/|\/|\.\/|\.\.\/|#)/i.test(s)) return s;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return undefined; // has a scheme we don't allow
+  return s; // schemeless relative
+}
+
 export default function DynamicCard({ data, variant = 'compact', onAction }: WidgetProps<DynamicData>) {
   const layout = data?.layout;
   const bag = (data?.item ?? {}) as ItemBag;
   const itemId = data?.itemId ?? data?.id ?? '';
-  if (!layout || !layout.title) return null;
+  const titleRef = layout && typeof layout.title === 'object' && layout.title ? layout.title : null;
+  if (!layout || !titleRef) return null;
 
-  const titleText = formatValue(bag[layout.title.field], layout.title.format);
+  const titleText = formatValue(getField(bag, titleRef.field), titleRef.format);
   const title = titleText && titleText !== '—' ? titleText : undefined;
-  const subtitle = (layout.subtitle ?? [])
-    .map((r) => formatValue(bag[r.field], r.format))
+  const subtitle = asArr<FieldRef>(layout.subtitle)
+    .filter((r) => r && typeof r === 'object')
+    .map((r) => formatValue(getField(bag, r.field), r.format))
     .filter((s) => s && s !== '—')
     .join(' · ');
-  const stats = (layout.stats ?? [])
+  const stats = asArr<FieldRef>(layout.stats)
+    .filter((r) => r && typeof r === 'object')
     .slice(0, MAX_STATS)
-    .map((r) => ({ label: r.label ?? r.field, value: formatValue(bag[r.field], r.format) }))
+    .map((r) => ({ label: r.label ?? r.field, value: formatValue(getField(bag, r.field), r.format) }))
     .filter((s) => s.value !== '—');
-  const chips = (layout.chips ?? [])
+  const chips = asArr<DynamicChip>(layout.chips)
+    .filter((c) => c && typeof c === 'object')
     .slice(0, MAX_CHIPS)
-    .map((c) => ({ tone: (c.tone ?? 'neutral') as 'success' | 'warning' | 'danger' | 'neutral', value: formatValue(bag[c.field]) }))
+    .map((c) => ({ tone: (c.tone ?? 'neutral') as 'success' | 'warning' | 'danger' | 'neutral', value: formatValue(getField(bag, c.field)) }))
     .filter((c) => c.value && c.value !== '—');
-  const badges = (layout.badges ?? []).filter((b) => evalPredicate(b.when, bag));
-  const bodyText = layout.body ? formatValue(bag[layout.body.field], layout.body.format) : '';
+  const badges = asArr<DynamicBadge>(layout.badges)
+    .filter((b) => b && typeof b === 'object' && typeof b.when === 'string' && evalPredicate(b.when, bag))
+    .slice(0, MAX_BADGES);
+  const bodyRef = layout.body && typeof layout.body === 'object' ? layout.body : null;
+  const bodyText = bodyRef ? formatValue(getField(bag, bodyRef.field), bodyRef.format) : '';
   const body = bodyText && bodyText !== '—' ? bodyText : undefined;
-  const mediaUrl = layout.media ? (bag[layout.media.field] as string | undefined) : undefined;
-  const actions = layout.actions ?? [];
-  const openHref = data.scoutUrl ?? data.url;
+  const mediaUrl =
+    layout.media && typeof layout.media === 'object' ? safeUrl(getField(bag, layout.media.field) as string | undefined) : undefined;
+  const actions = asArr<'love' | 'pass' | 'rate' | 'open'>(layout.actions);
+  const openHref = safeUrl(data.scoutUrl ?? data.url);
 
   const populated =
     (title ? 1 : 0) + (subtitle ? 1 : 0) + (stats.length ? 1 : 0) + (chips.length ? 1 : 0) + (body ? 1 : 0) + (mediaUrl ? 1 : 0);

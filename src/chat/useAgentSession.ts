@@ -90,6 +90,9 @@ export interface AgentSessionOptions {
   reconnect?: boolean;
   /** Initial owner (Omni-style multi-user chats); harmless/null elsewhere. */
   initialOwner?: string | null;
+  /** Live sender identity for the author caption (defaults to `owner`). Omni passes
+   *  () => currentUserRef.current so a SHARED chat stamps the sender, not the chat owner. */
+  getAuthor?: () => string | null;
   /** Called when a turn finishes (e.g. refresh a history pane). */
   onTurnEnd?: () => void;
 }
@@ -127,8 +130,11 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
   const lastMsg = useRef('');
   const lastImgs = useRef<OutgoingImage[]>([]);
   const wakeLock = useRef<WakeLockSentinel | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const turnEnd = useRef(onTurnEnd);
   turnEnd.current = onTurnEnd;
+  const getAuthorRef = useRef(opts.getAuthor);
+  getAuthorRef.current = opts.getAuthor;
 
   useEffect(() => {
     sessionRef.current = sessionId;
@@ -242,6 +248,19 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
         append({ kind: 'tool', name: (obj.name as string) || '', summary: obj.summary as string });
       } else if (event === 'result') {
         stopLive();
+      } else if (event === 'proposal') {
+        // Standalone proposal outcome (e.g. an accept applied/unsupported) — make it visible
+        // (otherwise a widget Accept round-trip produces a silent, empty-looking turn).
+        stopLive();
+        const status = obj.status as string | undefined;
+        const msg =
+          (obj.message as string) ||
+          (status === 'accepted' || status === 'committed'
+            ? 'Applied ✓'
+            : status === 'unsupported'
+              ? "That didn't match a pending change."
+              : '');
+        if (msg) append({ kind: 'assistant', id: nextId(), text: msg });
       } else if (event === 'error') {
         stopLive();
         append({ kind: 'error', message: (obj.message as string) || 'unknown error' });
@@ -261,6 +280,8 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
     reattaching.current = true;
     setBusy(true);
     acquireWake();
+    const ctrl = new AbortController();
+    abortRef.current = ctrl;
     const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
     try {
       for (let attempt = 0; attempt < 4; attempt++) {
@@ -270,6 +291,7 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
             `${streamEndpoint}?sessionId=${encodeURIComponent(sid)}&turnId=${encodeURIComponent(
               turnId.current!,
             )}&cursor=${maxSeq.current}`,
+            { signal: ctrl.signal },
           );
         } catch {
           await sleep(700 * (attempt + 1));
@@ -307,12 +329,15 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
       lastMsg.current = text;
       lastImgs.current = images;
       acquireWake();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
       let resp: Response;
       try {
         resp = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(buildBody(text, images, { sessionId: sessionRef.current })),
+          signal: ctrl.signal,
         });
       } catch {
         endTurn();
@@ -333,8 +358,12 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
         return;
       }
       if (!resp.ok || !resp.body) {
+        const detail = await resp
+          .json()
+          .then((b) => (b && (b.detail || b.error)) || null)
+          .catch(() => null);
         endTurn();
-        append({ kind: 'error', message: 'server error ' + resp.status });
+        append({ kind: 'error', message: detail || 'server error ' + resp.status });
         return;
       }
       attached.current = true;
@@ -363,7 +392,7 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
         kind: 'user',
         id: nextId(),
         text: t,
-        author: owner,
+        author: getAuthorRef.current ? getAuthorRef.current() : owner,
         images: previews.length ? previews : undefined,
         imageCount: images.length,
       });
@@ -417,6 +446,19 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
       window.removeEventListener('online', onOnline);
     };
   }, [reconnect, busy, acquireWake, reattachLoop]);
+
+  // Release the wake lock + abort any in-flight fetch on unmount.
+  useEffect(
+    () => () => {
+      try {
+        wakeLock.current?.release();
+      } catch {
+        /* ignore */
+      }
+      abortRef.current?.abort();
+    },
+    [],
+  );
 
   return {
     state: { entries, busy, sessionId, title, owner, sharedWith },
