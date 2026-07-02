@@ -37,6 +37,22 @@ export {
 } from './chat/AgentChat';
 export { parseWidgetProtocol, type ChatSegment } from './chat/parseWidgetProtocol';
 export { default as Markdown, type MarkdownProps } from './chat/Markdown';
+export { consumeSse, parseFrame, type SseFrame, type ConsumeStatus } from './chat/consumeSse';
+export {
+  useAgentSession,
+  type UseAgentSession,
+  type AgentSessionOptions,
+  type OutgoingImage,
+  type Entry,
+  type UserEntry,
+  type AssistantEntry,
+  type ToolLine,
+  type QuestionCard,
+  type ErrLine,
+  type RetryLine,
+  type ChatState,
+  type LoadRecord,
+} from './chat/useAgentSession';
 
 // ── Widgets ──────────────────────────────────────────────────────────────────
 export { default as MovieCard } from './widgets/MovieCard';
