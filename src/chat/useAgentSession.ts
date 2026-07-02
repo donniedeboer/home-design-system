@@ -352,7 +352,9 @@ export function useAgentSession(opts: AgentSessionOptions): UseAgentSession {
         const info = (await resp.json().catch(() => ({}))) as { turnId?: string };
         turnId.current = info.turnId || null;
         maxSeq.current = -1;
-        if (turnId.current && reconnect) return reattachLoop();
+        // Reattach needs a session id for the stream URL; without one (e.g. a second tab that
+        // never started a turn here) fall through to a visible error instead of wedging busy.
+        if (turnId.current && reconnect && sessionRef.current) return reattachLoop();
         endTurn();
         append({ kind: 'error', message: 'A turn is already running on this chat.' });
         return;
