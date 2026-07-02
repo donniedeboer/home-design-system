@@ -35,6 +35,12 @@ export {
   type ChatRole,
   type ChatStreamEvent,
 } from './chat/AgentChat';
+export {
+  default as AgentChatModal,
+  type AgentChatModalProps,
+  type Dock,
+  type SeedLine,
+} from './chat/AgentChatModal';
 export { parseWidgetProtocol, type ChatSegment } from './chat/parseWidgetProtocol';
 export { default as Markdown, type MarkdownProps } from './chat/Markdown';
 export { consumeSse, parseFrame, type SseFrame, type ConsumeStatus } from './chat/consumeSse';
