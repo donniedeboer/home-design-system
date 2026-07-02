@@ -36,6 +36,7 @@ export default function AppShell({
   sideNavCollapsed = false,
   sideNavFooter,
   maxWidth = '3xl',
+  mainClassName = 'min-w-0 flex-1 px-4 py-4',
   provider,
   children,
 }: {
@@ -53,6 +54,12 @@ export default function AppShell({
   sideNavCollapsed?: boolean;
   sideNavFooter?: ReactNode;
   maxWidth?: '3xl' | '5xl' | 'full';
+  /**
+   * className for the <main> element. Defaults to `"min-w-0 flex-1 px-4 py-4"`
+   * (the padded standard). Pass `"min-w-0 flex-1"` to make main full-bleed so an
+   * app can render an edge-to-edge, flush layout (e.g. a full-height side rail).
+   */
+  mainClassName?: string;
   /** optional child-wrapper (e.g. an app-local data provider). */
   provider?: ComponentType<{ children: ReactNode }>;
   children: ReactNode;
@@ -72,7 +79,7 @@ export default function AppShell({
         {sideNav && sideNav.length > 0 && (
           <SideNav sections={sideNav} collapsed={sideNavCollapsed} footer={sideNavFooter} />
         )}
-        <main className="min-w-0 flex-1 px-4 py-4">{children}</main>
+        <main className={mainClassName}>{children}</main>
       </div>
     </div>
   );
