@@ -107,6 +107,57 @@ export interface DiffData {
   status?: 'committed' | 'queued' | string;
 }
 
+export type DynamicFieldFormat = 'usd' | 'number' | 'date' | 'percent' | 'text';
+
+/** A reference to one extracted field, with an optional human label and display format. */
+export interface FieldRef {
+  field: string;
+  label?: string;
+  format?: DynamicFieldFormat;
+}
+
+/** A conditional badge — shown when `when` (a safe `field op value` predicate) is true. */
+export interface DynamicBadge {
+  when: string;
+  text: string;
+  hue: 'success' | 'warning' | 'danger';
+}
+
+/** A value chip keyed off one field (data hues only). */
+export interface DynamicChip {
+  field: string;
+  tone?: 'success' | 'warning' | 'danger';
+}
+
+/**
+ * A declarative, agent-authored layout over a CLOSED vocabulary — never code, never
+ * markup. Interpreted by DynamicCard into design-system primitives. Hard clamps
+ * (≤6 stats, ≤4 chips), the format enum, and the badge predicate DSL keep it safe.
+ */
+export interface DynamicLayout {
+  media?: { field: string; shape: 'poster' | 'thumb' | 'wide' };
+  title: FieldRef;
+  subtitle?: FieldRef[];
+  stats?: FieldRef[]; // clamped to 6
+  chips?: DynamicChip[]; // clamped to 4
+  badges?: DynamicBadge[];
+  body?: FieldRef;
+  actions?: Array<'love' | 'pass' | 'rate' | 'open'>;
+}
+
+/** The `data` payload for a `dynamic` widget: a layout + the item's normalized field bag. */
+export interface DynamicData {
+  id?: string;
+  /** stable id used to round-trip love/pass/rate commands (e.g. the candidate id). */
+  itemId: string;
+  layout: DynamicLayout;
+  item: Record<string, string | number | boolean | null | undefined>;
+  /** external link for the `open` action. */
+  url?: string;
+  /** in-platform link for the `open` action (preferred over `url`). */
+  scoutUrl?: string;
+}
+
 export type WidgetDescriptor =
   | { type: 'movie'; variant?: WidgetVariant; data: MovieData; fallback?: string }
   | { type: 'listing'; variant?: WidgetVariant; data: ListingData; fallback?: string }
@@ -115,7 +166,8 @@ export type WidgetDescriptor =
   | { type: 'song'; variant?: WidgetVariant; data: SongData; fallback?: string }
   | { type: 'aesthetic'; variant?: WidgetVariant; data: AestheticData; fallback?: string }
   | { type: 'multichoice'; variant?: WidgetVariant; data: MultiChoiceData; fallback?: string }
-  | { type: 'diff'; variant?: WidgetVariant; data: DiffData; fallback?: string };
+  | { type: 'diff'; variant?: WidgetVariant; data: DiffData; fallback?: string }
+  | { type: 'dynamic'; variant?: WidgetVariant; data: DynamicData; fallback?: string };
 
 export type WidgetType = WidgetDescriptor['type'];
 

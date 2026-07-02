@@ -47,7 +47,21 @@ export { default as SongCard } from './widgets/SongCard';
 export { default as Aesthetic } from './widgets/Aesthetic';
 export { default as MultiChoice } from './widgets/MultiChoice';
 export { default as Diff } from './widgets/Diff';
+export { default as DynamicCard } from './widgets/DynamicCard';
 export { Widget, widgetRegistry } from './widgets/registry';
+export {
+  validateLayout,
+  evalPredicate,
+  formatValue,
+  FIELD_FORMATS,
+  BADGE_HUES,
+  ACTION_VERBS,
+  MAX_STATS,
+  MAX_CHIPS,
+  type LayoutValidation,
+  type ItemBag,
+  type FieldValue,
+} from './widgets/dynamicLayout';
 export {
   type WidgetVariant,
   type WidgetType,
@@ -64,6 +78,12 @@ export {
   type AestheticData,
   type MultiChoiceData,
   type DiffData,
+  type DynamicData,
+  type DynamicLayout,
+  type DynamicChip,
+  type DynamicBadge,
+  type FieldRef,
+  type DynamicFieldFormat,
 } from './widgets/types';
 
 // ── Accent registry ──────────────────────────────────────────────────────────
