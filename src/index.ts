@@ -72,6 +72,16 @@ export { default as Diff } from './widgets/Diff';
 export { default as DynamicCard } from './widgets/DynamicCard';
 export { Widget, widgetRegistry } from './widgets/registry';
 export {
+  FitChip,
+  WhyLine,
+  ReasoningBlock,
+  ResearchChip,
+  ResearchRow,
+  researchDims,
+  fitTone,
+  MAX_RESEARCH_DIMS,
+} from './widgets/Reasoning';
+export {
   validateLayout,
   evalPredicate,
   formatValue,
@@ -92,6 +102,8 @@ export {
   type WidgetAction,
   type Reaction,
   type FitVerdict,
+  type ResearchDim,
+  type ResearchTier,
   type MovieData,
   type ListingData,
   type ChecklistData,

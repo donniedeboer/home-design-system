@@ -4,7 +4,7 @@ import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import { evalPredicate, formatValue, getField, MAX_STATS, MAX_CHIPS, MAX_BADGES, type ItemBag } from './dynamicLayout';
 import ReactionBar from './ReactionBar';
-import { FitChip, WhyLine, ReasoningBlock, fitTone } from './Reasoning';
+import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow, researchDims, fitTone } from './Reasoning';
 
 /**
  * DynamicCard [dyn] — renders an agent-authored declarative layout (DynamicLayout) for a
@@ -67,6 +67,9 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
   const openHref = safeUrl(data.scoutUrl ?? data.url);
   const why = typeof data?.why === 'string' && data.why.trim() ? data.why : undefined;
   const showFit = fitTone(data?.fit) != null;
+  // tier 'triage' = provisional listing-native rank: the fit verdict renders muted with a "~".
+  const provisional = data?.tier === 'triage';
+  const hasResearch = researchDims(data?.research).length > 0;
 
   const populated =
     (title ? 1 : 0) + (subtitle ? 1 : 0) + (stats.length ? 1 : 0) + (chips.length ? 1 : 0) + (body ? 1 : 0) + (mediaUrl ? 1 : 0) + (why ? 1 : 0);
@@ -114,11 +117,12 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
           {title && <div className="truncate text-sm font-semibold text-fg">{title}</div>}
           {subtitle && <div className="truncate text-[11px] text-fg-muted">{subtitle}</div>}
           <WhyLine why={why} className="mt-0.5" />
-          {(badges.length > 0 || chips.length > 0 || showFit) && (
+          {(badges.length > 0 || chips.length > 0 || showFit || hasResearch) && (
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               {badgeRow}
               {chipRow}
-              <FitChip fit={data?.fit} />
+              <FitChip fit={data?.fit} provisional={provisional} />
+              <ResearchChip research={data?.research} />
             </div>
           )}
         </div>
@@ -156,7 +160,8 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
           </div>
         )}
         {body && <p className="mt-3 text-[15px] leading-[1.6] text-fg">{body}</p>}
-        <ReasoningBlock fit={data?.fit} why={why} pros={data?.pros} cons={data?.cons} advice={data?.advice} />
+        <ResearchRow research={data?.research} className="mt-3" />
+        <ReasoningBlock fit={data?.fit} why={why} pros={data?.pros} cons={data?.cons} advice={data?.advice} provisional={provisional} />
         {onAction && actions.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {wantsThumbs && <ReactionBar kind="item" id={itemId} reaction={data?.reaction} onAction={onAction} />}

@@ -4,7 +4,7 @@ import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import Gallery from './Gallery';
 import ReactionBar from './ReactionBar';
-import { FitChip, WhyLine, ReasoningBlock } from './Reasoning';
+import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
 
 function money(n?: number): string | undefined {
   return n == null ? undefined : `$${n.toLocaleString('en-US')}`;
@@ -15,6 +15,8 @@ function money(n?: number): string | undefined {
  * drop chips, click-through (the calmer representative preview); full = hero + gallery
  * rail + DataGrid spec grid + summary + synthesized-fit reasoning + thumbs-with-note +
  * Open-in-Scout. Score/drop/fit use DATA hues (success/danger/neutral), never the accent.
+ * Research transparency: compact shows a "n/m researched" chip, full a ✓/○ dimension row;
+ * tier 'triage' renders score/fit muted with a "~" (provisional, not deep-researched).
  */
 export default function ListingCard({ data, variant = 'compact', onAction }: WidgetProps<ListingData>) {
   const price = money(data.price);
@@ -28,10 +30,19 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
     .join(' · ');
   const cityLine = [data.city, data.region, data.zip].filter(Boolean).join(', ');
 
+  // tier 'triage' = provisional listing-native rank: the score renders muted with a "~".
+  const provisional = data.tier === 'triage';
   const chips = (
     <>
       {dropped && <Chip tone="success">↓ {money(data.lastPrice! - data.price!)}</Chip>}
-      {data.score != null && <Chip tone="neutral">Fit {data.score}</Chip>}
+      {data.score != null &&
+        (provisional ? (
+          <Chip tone="neutral">
+            <span className="italic opacity-80">~Fit {data.score}</span>
+          </Chip>
+        ) : (
+          <Chip tone="neutral">Fit {data.score}</Chip>
+        ))}
       {data.status && <Chip tone="neutral">{data.status}</Chip>}
     </>
   );
@@ -48,7 +59,8 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {price && <span className="text-sm font-semibold tabular-nums text-fg">{price}</span>}
             {chips}
-            <FitChip fit={data.fit} />
+            <FitChip fit={data.fit} provisional={provisional} />
+            <ResearchChip research={data.research} />
           </div>
         </div>
       </div>
@@ -77,6 +89,7 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
           {price && <div className="shrink-0 text-lg font-semibold tabular-nums text-fg">{price}</div>}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-1.5">{chips}</div>
+        <ResearchRow research={data.research} className="mt-2" />
 
         {data.photos && data.photos.length > 0 && (
           <div className="mt-3">
@@ -97,7 +110,7 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
 
         {data.summary && <p className="mt-3 text-[15px] leading-[1.6] text-fg">{data.summary}</p>}
 
-        <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} />
+        <ReasoningBlock fit={data.fit} why={data.why} pros={data.pros} cons={data.cons} advice={data.advice} provisional={provisional} />
 
         {onAction && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
