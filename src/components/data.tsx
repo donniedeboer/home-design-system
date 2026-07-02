@@ -1,3 +1,4 @@
+'use client';
 import type { ReactNode } from 'react';
 import { useRouter, type RouterAdapter } from '../router/RouterProvider';
 
