@@ -49,8 +49,11 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
         </div>
       </div>
     );
-    return data.url ? (
-      <a href={data.url} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]">
+    // Prefer the Scout candidate page over the raw source listing so a click stays in the
+    // platform; fall back to the source listing when Scout has no permalink for it.
+    const cardHref = data.scoutUrl ?? data.url;
+    return cardHref ? (
+      <a href={cardHref} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]">
         {inner}
       </a>
     ) : (
@@ -98,9 +101,14 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
             <Button variant="secondary" size="sm" onClick={() => onAction(`pass listing ${data.propertyId}`)}>
               Pass
             </Button>
-            {data.url && (
-              <Button as="a" href={data.url} variant="ghost" size="sm">
+            {data.scoutUrl && (
+              <Button as="a" href={data.scoutUrl} target="_blank" rel="noreferrer" variant="ghost" size="sm">
                 Open in Scout
+              </Button>
+            )}
+            {data.url && (
+              <Button as="a" href={data.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
+                View listing ↗
               </Button>
             )}
           </div>

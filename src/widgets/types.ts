@@ -37,7 +37,8 @@ export interface ListingData {
   lotSize?: string;
   status?: string;
   score?: number;
-  url?: string;
+  url?: string; // the ORIGINAL source listing (Redfin/Compass/Zillow)
+  scoutUrl?: string; // the candidate's page in Scout's own UI (the "Open in Scout" target)
   photo_url?: string; // CDN hero (representative preview; safe off-tailnet)
   photos?: string[]; // full gallery (tailnet-only Scout route)
   summary?: string;
