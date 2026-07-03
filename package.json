@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": false,
   "type": "module",
-  "description": "Dark-only, information-first shared design system for the home platform — tokens + router-agnostic React components + AgentChat + widgets.",
+  "description": "Dark-only, information-first shared design system for the home platform \u2014 tokens + router-agnostic React components + AgentChat + widgets.",
   "sideEffects": [
     "*.css"
   ],
@@ -14,7 +14,11 @@
     },
     "./tokens.css": "./src/tokens/design-tokens.css",
     "./theme.css": "./src/tokens/theme.css",
-    "./icon.svg": "./src/icon.svg"
+    "./icon.svg": "./src/icon.svg",
+    "./spec": {
+      "types": "./dist/spec.d.ts",
+      "import": "./dist/spec.js"
+    }
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",

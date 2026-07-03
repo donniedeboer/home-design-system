@@ -1,7 +1,9 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: { index: 'src/index.ts' },
+  // `spec` is the SERVER-SAFE entry (pure DSL, no React) — stamp-use-client.mjs stamps ONLY
+  // index.js, so spec.js stays importable from Next server code.
+  entry: { index: 'src/index.ts', spec: 'src/spec.ts' },
   format: ['esm'],
   dts: true,
   sourcemap: true,
