@@ -3,6 +3,7 @@ import type { DynamicData, DynamicBadge, DynamicChip, FieldRef, WidgetProps } fr
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import { evalPredicate, formatValue, getField, MAX_STATS, MAX_CHIPS, MAX_BADGES, type ItemBag } from './dynamicLayout';
+import AnalyzeAction from './AnalyzeAction';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow, researchDims, fitTone } from './Reasoning';
 
@@ -162,9 +163,10 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
         {body && <p className="mt-3 text-[15px] leading-[1.6] text-fg">{body}</p>}
         <ResearchRow research={data?.research} className="mt-3" />
         <ReasoningBlock fit={data?.fit} why={why} pros={data?.pros} cons={data?.cons} advice={data?.advice} provisional={provisional} />
-        {onAction && actions.length > 0 && (
+        {onAction && (actions.length > 0 || data?.analyzable) && (
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {wantsThumbs && <ReactionBar kind="item" id={itemId} reaction={data?.reaction} onAction={onAction} />}
+            {data?.analyzable && <AnalyzeAction kind="item" id={itemId} onAction={onAction} />}
             {actions.includes('rate') && (
               <div className="flex items-center gap-0.5" role="group" aria-label="Rate">
                 {[1, 2, 3, 4, 5].map((n) => (

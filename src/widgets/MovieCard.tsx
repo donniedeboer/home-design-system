@@ -1,5 +1,6 @@
 'use client';
 import type { MovieData, WidgetProps } from './types';
+import AnalyzeAction from './AnalyzeAction';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
 
@@ -70,6 +71,9 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
             {RatingPill}
             {onAction && (
               <ReactionBar kind="movie" id={data.id ?? data.title} reaction={data.reaction} onAction={onAction} />
+            )}
+            {onAction && data.analyzable && (
+              <AnalyzeAction kind="movie" id={data.id ?? data.title} onAction={onAction} />
             )}
             {data.url && (
               <a

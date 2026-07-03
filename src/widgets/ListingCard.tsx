@@ -2,6 +2,7 @@
 import type { ListingData, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
+import AnalyzeAction from './AnalyzeAction';
 import Gallery from './Gallery';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
@@ -48,11 +49,29 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
   );
 
   if (variant === 'compact') {
-    const inner = (
-      <div className="flex items-stretch gap-3 rounded-xl border border-border bg-surface-0 p-0 transition-colors hover:border-border-strong">
+    // Prefer the Scout candidate page over the raw source listing so a click stays in the
+    // platform; fall back to the source listing when Scout has no permalink for it. The link
+    // is STRETCHED over the card (anchor ::after) rather than wrapping it, so in-card actions
+    // (AnalyzeAction) stay valid, clickable HTML — never a button nested in an anchor, never
+    // a control tacked on after the card.
+    const cardHref = data.scoutUrl ?? data.url;
+    const showAnalyze = Boolean(onAction && data.analyzable);
+    return (
+      <div className="relative flex items-stretch gap-3 rounded-xl border border-border bg-surface-0 p-0 transition-colors focus-within:border-border-strong hover:border-border-strong">
         <Hero url={data.photo_url} alt={data.address} className="w-28 shrink-0 rounded-l-xl" />
         <div className="min-w-0 flex-1 py-2.5 pr-3">
-          <div className="truncate text-sm font-semibold text-fg">{data.address}</div>
+          <div className="truncate text-sm font-semibold text-fg">
+            {cardHref ? (
+              <a
+                href={cardHref}
+                className="after:absolute after:inset-0 after:rounded-xl focus-visible:outline-none"
+              >
+                {data.address}
+              </a>
+            ) : (
+              data.address
+            )}
+          </div>
           {cityLine && <div className="truncate text-[11px] text-fg-muted">{cityLine}</div>}
           {metaLine && <div className="mt-0.5 text-[11px] text-fg-subtle">{metaLine}</div>}
           <WhyLine why={data.why} className="mt-0.5" />
@@ -61,19 +80,17 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
             {chips}
             <FitChip fit={data.fit} provisional={provisional} />
             <ResearchChip research={data.research} />
+            {showAnalyze && (
+              <AnalyzeAction
+                kind="listing"
+                id={data.propertyId}
+                onAction={onAction!}
+                className="relative z-[1] ml-auto"
+              />
+            )}
           </div>
         </div>
       </div>
-    );
-    // Prefer the Scout candidate page over the raw source listing so a click stays in the
-    // platform; fall back to the source listing when Scout has no permalink for it.
-    const cardHref = data.scoutUrl ?? data.url;
-    return cardHref ? (
-      <a href={cardHref} className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]">
-        {inner}
-      </a>
-    ) : (
-      inner
     );
   }
 

@@ -33,6 +33,8 @@ export type ResearchTier = 'vetted' | 'triage';
 
 export interface MovieData {
   id?: string;
+  /** render the in-card Analyze action (emits `analyze movie <id>`). */
+  analyzable?: boolean;
   title: string;
   year?: number;
   poster_url?: string;
@@ -61,6 +63,8 @@ export interface MovieData {
 export interface ListingData {
   propertyId: string;
   candidateId?: number;
+  /** render the in-card Analyze action (emits `analyze listing <propertyId>`). */
+  analyzable?: boolean;
   address: string;
   city?: string;
   region?: string;
@@ -201,6 +205,8 @@ export interface DynamicData {
   id?: string;
   /** stable id used to round-trip up/down/rate commands (e.g. the candidate id). */
   itemId: string;
+  /** render the in-card Analyze action (emits `analyze item <itemId>`). */
+  analyzable?: boolean;
   layout: DynamicLayout;
   item: Record<string, string | number | boolean | null | undefined>;
   /** external link for the `open` action. */
@@ -247,6 +253,9 @@ export type WidgetType = WidgetDescriptor['type'];
  * still accepted in DynamicLayout.actions, but cards only EMIT up/down.
  * Ratings: DynamicCard's `rate` verb still emits `rate item <id> <n>`; MovieCard's rating is
  * now a display only (no `rate movie …` emission).
+ * Analyze: cards whose data sets `analyzable: true` render the in-card AnalyzeAction, which
+ * emits `analyze <kind> <id>` (same kind/id pairs as the thumbs). The host runs its deep-dive
+ * and REMOUNTS the card when it lands (fresh key / tier move) so the pending state clears.
  */
 export type WidgetAction = (message: string) => void;
 
