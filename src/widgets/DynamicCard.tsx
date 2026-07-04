@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import type { DynamicData, DynamicBadge, DynamicChip, FieldRef, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
@@ -211,6 +212,8 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
 }
 
 function Media({ url, alt, className = '' }: { url: string; alt: string; className?: string }) {
+  const [broken, setBroken] = useState(false);
+  if (broken) return <div className={`bg-surface-2 ${className}`} aria-hidden />;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={alt} className={`object-cover ${className}`} loading="lazy" />;
+  return <img src={url} alt={alt} className={`object-cover ${className}`} loading="lazy" onError={() => setBroken(true)} />;
 }

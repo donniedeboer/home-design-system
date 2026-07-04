@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { MovieData, WidgetProps } from './types';
 import AnalyzeAction from './AnalyzeAction';
@@ -111,7 +112,8 @@ function Poster({
   /** rendered inside the empty slot (MediaFetch) — the placeholder IS the affordance. */
   fetchSlot?: ReactNode;
 }) {
-  if (url) {
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -121,6 +123,7 @@ function Poster({
         height={h}
         className="shrink-0 rounded-md border border-border object-cover"
         style={{ width: w, height: h }}
+        onError={() => setBroken(true)}
       />
     );
   }

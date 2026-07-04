@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ListingData, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
@@ -194,7 +195,9 @@ function Hero({
   /** rendered inside the empty slot (MediaFetch) — the placeholder IS the affordance. */
   fetchSlot?: ReactNode;
 }) {
-  if (!url) {
+  const [broken, setBroken] = useState(false);
+  if (!url || broken) {
+    // A dead CDN link (mined heroes go stale) renders the placeholder — never alt-text soup.
     return (
       <div className={`flex items-center justify-center bg-surface-2 text-fg-subtle ${className}`} aria-hidden={!fetchSlot}>
         {fetchSlot ?? '🏠'}
@@ -202,5 +205,5 @@ function Hero({
     );
   }
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={alt} className={`object-cover ${className}`} loading="lazy" />;
+  return <img src={url} alt={alt} className={`object-cover ${className}`} loading="lazy" onError={() => setBroken(true)} />;
 }
