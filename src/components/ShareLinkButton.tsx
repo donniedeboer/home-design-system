@@ -35,12 +35,20 @@ export default function ShareLinkButton({
   const onClick = async () => {
     if (state === 'busy') return;
     setState('busy');
+    let url: string;
     try {
-      const url = await getUrl();
+      url = await getUrl();
+    } catch {
+      settle('failed'); // "failed" means the LINK couldn't be minted — not a clipboard quirk
+      return;
+    }
+    try {
       await navigator.clipboard.writeText(url);
       settle('copied');
     } catch {
-      settle('failed');
+      // Clipboard blocked (permissions policy, embedded context) — degrade to manual copy.
+      window.prompt('Copy this share link:', url);
+      settle('copied');
     }
   };
 
