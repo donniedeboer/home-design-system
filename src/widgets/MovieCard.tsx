@@ -1,6 +1,8 @@
 'use client';
+import type { ReactNode } from 'react';
 import type { MovieData, WidgetProps } from './types';
 import AnalyzeAction from './AnalyzeAction';
+import MediaFetch from './MediaFetch';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
 
@@ -27,10 +29,15 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
     </span>
   ) : null;
 
+  const posterFetchSlot =
+    onAction && data.mediaFetchable ? (
+      <MediaFetch kind="movie" id={data.id ?? data.title} onAction={onAction} failed={data.mediaFetchFailed} />
+    ) : undefined;
+
   if (variant === 'compact') {
     return (
       <div className="flex items-start gap-3 rounded-xl border border-border bg-surface-0 p-2.5">
-        <Poster url={data.poster_url} title={data.title} w={62} h={92} />
+        <Poster url={data.poster_url} title={data.title} w={62} h={92} fetchSlot={posterFetchSlot} />
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-semibold text-fg">
             {data.title}
@@ -55,7 +62,7 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
   return (
     <div className="rounded-xl border border-border bg-surface-0 p-3 shadow-soft">
       <div className="flex items-start gap-4">
-        <Poster url={data.poster_url} title={data.title} w={96} h={144} />
+        <Poster url={data.poster_url} title={data.title} w={96} h={144} fetchSlot={posterFetchSlot} />
         <div className="min-w-0 flex-1">
           <div className="text-md font-semibold text-fg">
             {data.title}
@@ -90,7 +97,20 @@ export default function MovieCard({ data, variant = 'compact', onAction }: Widge
   );
 }
 
-function Poster({ url, title, w, h }: { url?: string; title: string; w: number; h: number }) {
+function Poster({
+  url,
+  title,
+  w,
+  h,
+  fetchSlot,
+}: {
+  url?: string;
+  title: string;
+  w: number;
+  h: number;
+  /** rendered inside the empty slot (MediaFetch) — the placeholder IS the affordance. */
+  fetchSlot?: ReactNode;
+}) {
   if (url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -108,9 +128,9 @@ function Poster({ url, title, w, h }: { url?: string; title: string; w: number; 
     <div
       className="flex shrink-0 items-center justify-center rounded-md border border-border bg-surface-2 text-fg-subtle"
       style={{ width: w, height: h }}
-      aria-hidden
+      aria-hidden={!fetchSlot}
     >
-      🎬
+      {fetchSlot ?? '🎬'}
     </div>
   );
 }

@@ -35,6 +35,10 @@ export interface MovieData {
   id?: string;
   /** render the in-card Analyze action (emits `analyze movie <id>`). */
   analyzable?: boolean;
+  /** empty poster slot offers "Fetch image" (emits `fetch-image movie <id>`). */
+  mediaFetchable?: boolean;
+  /** a fetch already came up dry — the slot shows "No image available" instead. */
+  mediaFetchFailed?: boolean;
   title: string;
   year?: number;
   poster_url?: string;
@@ -65,6 +69,10 @@ export interface ListingData {
   candidateId?: number;
   /** render the in-card Analyze action (emits `analyze listing <propertyId>`). */
   analyzable?: boolean;
+  /** empty hero slot offers "Fetch image" (emits `fetch-image listing <propertyId>`). */
+  mediaFetchable?: boolean;
+  /** a fetch already came up dry — the slot shows "No image available" instead. */
+  mediaFetchFailed?: boolean;
   address: string;
   city?: string;
   region?: string;
@@ -207,6 +215,10 @@ export interface DynamicData {
   itemId: string;
   /** render the in-card Analyze action (emits `analyze item <itemId>`). */
   analyzable?: boolean;
+  /** empty media slot offers "Fetch image" (emits `fetch-image item <itemId>`). */
+  mediaFetchable?: boolean;
+  /** a fetch already came up dry — the slot shows "No image available" instead. */
+  mediaFetchFailed?: boolean;
   layout: DynamicLayout;
   item: Record<string, string | number | boolean | null | undefined>;
   /** external link for the `open` action. */
@@ -256,6 +268,9 @@ export type WidgetType = WidgetDescriptor['type'];
  * Analyze: cards whose data sets `analyzable: true` render the in-card AnalyzeAction, which
  * emits `analyze <kind> <id>` (same kind/id pairs as the thumbs). The host runs its deep-dive
  * and REMOUNTS the card when it lands (fresh key / tier move) so the pending state clears.
+ * Fetch image: `mediaFetchable: true` puts a "Fetch image" affordance INSIDE the empty media
+ * slot (emits `fetch-image <kind> <id>`); `mediaFetchFailed: true` renders the calm
+ * "No image available" caption there instead (a prior attempt found nothing).
  */
 export type WidgetAction = (message: string) => void;
 

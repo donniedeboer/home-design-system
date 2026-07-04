@@ -5,6 +5,7 @@ import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import AnalyzeAction from './AnalyzeAction';
 import Gallery from './Gallery';
+import MediaFetch from './MediaFetch';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow } from './Reasoning';
 
@@ -70,7 +71,22 @@ export default function ListingCard({
     const showAnalyze = Boolean(onAction && data.analyzable);
     return (
       <div className="relative flex items-stretch gap-3 rounded-xl border border-border bg-surface-0 p-0 transition-colors focus-within:border-border-strong hover:border-border-strong">
-        <Hero url={data.photo_url} alt={data.address} className="w-28 shrink-0 rounded-l-xl" />
+        <Hero
+          url={data.photo_url}
+          alt={data.address}
+          className="w-28 shrink-0 rounded-l-xl"
+          fetchSlot={
+            onAction && data.mediaFetchable ? (
+              <MediaFetch
+                kind="listing"
+                id={data.propertyId}
+                onAction={onAction}
+                failed={data.mediaFetchFailed}
+                className="relative z-[1]"
+              />
+            ) : undefined
+          }
+        />
         <div className="min-w-0 flex-1 py-2.5 pr-3">
           <div className="truncate text-sm font-semibold text-fg">
             {cardHref ? (
@@ -164,11 +180,22 @@ export default function ListingCard({
   );
 }
 
-function Hero({ url, alt, className = '' }: { url?: string; alt: string; className?: string }) {
+function Hero({
+  url,
+  alt,
+  className = '',
+  fetchSlot,
+}: {
+  url?: string;
+  alt: string;
+  className?: string;
+  /** rendered inside the empty slot (MediaFetch) — the placeholder IS the affordance. */
+  fetchSlot?: ReactNode;
+}) {
   if (!url) {
     return (
-      <div className={`flex items-center justify-center bg-surface-2 text-fg-subtle ${className}`} aria-hidden>
-        🏠
+      <div className={`flex items-center justify-center bg-surface-2 text-fg-subtle ${className}`} aria-hidden={!fetchSlot}>
+        {fetchSlot ?? '🏠'}
       </div>
     );
   }

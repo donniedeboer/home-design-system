@@ -4,6 +4,7 @@ import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
 import { evalPredicate, formatValue, getField, MAX_STATS, MAX_CHIPS, MAX_BADGES, type ItemBag } from './dynamicLayout';
 import AnalyzeAction from './AnalyzeAction';
+import MediaFetch from './MediaFetch';
 import ReactionBar from './ReactionBar';
 import { FitChip, WhyLine, ReasoningBlock, ResearchChip, ResearchRow, researchDims, fitTone } from './Reasoning';
 
@@ -108,12 +109,24 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
     </div>
   );
 
+  // The empty-slot affordance: only when the LAYOUT declares media (an imageless layout
+  // shouldn't grow a gray box) and the host flagged the item fetchable / already-tried.
+  const mediaFetchSlot =
+    layout.media && !mediaUrl && onAction && (data?.mediaFetchable || data?.mediaFetchFailed) ? (
+      <MediaFetch kind="item" id={itemId} onAction={onAction} failed={data?.mediaFetchFailed} className="relative z-[1]" />
+    ) : undefined;
+
   if (variant === 'compact') {
     const mediaAspect =
       layout.media?.shape === 'poster' ? 'aspect-[2/3]' : layout.media?.shape === 'wide' ? 'aspect-[16/9]' : 'aspect-square';
     const inner = (
       <div className="flex items-stretch gap-3 rounded-xl border border-border bg-surface-0 transition-colors hover:border-border-strong">
         {mediaUrl && <Media url={mediaUrl} alt={title ?? ''} className={`w-24 shrink-0 rounded-l-xl ${mediaAspect}`} />}
+        {mediaFetchSlot && (
+          <div className={`flex w-24 shrink-0 items-center justify-center rounded-l-xl bg-surface-2 ${mediaAspect}`}>
+            {mediaFetchSlot}
+          </div>
+        )}
         <div className="min-w-0 flex-1 py-2.5 pr-3">
           {title && <div className="truncate text-sm font-semibold text-fg">{title}</div>}
           {subtitle && <div className="truncate text-[11px] text-fg-muted">{subtitle}</div>}
@@ -145,6 +158,9 @@ export default function DynamicCard({ data, variant = 'compact', onAction }: Wid
     <div className="overflow-hidden rounded-xl border border-border bg-surface-0 shadow-soft">
       {mediaUrl && (
         <Media url={mediaUrl} alt={title ?? ''} className={`w-full ${layout.media?.shape === 'wide' ? 'aspect-[16/9]' : 'aspect-[3/2]'}`} />
+      )}
+      {mediaFetchSlot && (
+        <div className="flex h-28 w-full items-center justify-center bg-surface-2">{mediaFetchSlot}</div>
       )}
       <div className="p-3">
         {title && <div className="text-md font-semibold text-fg">{title}</div>}
