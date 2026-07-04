@@ -219,4 +219,8 @@ table, input, .tabular { font-variant-numeric: tabular-nums; }
    devbot (amber · deep-tint ink · 7.67/9.87:1 — fill = accent, OMIT accent-btn):
      --color-accent:#f59e0b; --color-accent-hover:#fbbf24; --color-accent-fg:#2c1c02;
      --color-accent-subtle:#451a03; --color-accent-muted:#78350f; --color-accent-text:#fcd34d; --color-ring:#fbbf24;
+   Foreman (violet · white ink · 6.01/5.02:1 — DARKENED fill, keep accent-btn):
+     --color-accent:#8b5cf6; --color-accent-hover:#a78bfa;
+     --color-accent-btn:#6f35f4; --color-accent-btn-hover:#7e4af5; --color-accent-fg:#ffffff;
+     --color-accent-subtle:#2e1065; --color-accent-muted:#5b21b6; --color-accent-text:#c4b5fd; --color-ring:#a78bfa;
    ============================================================================ */

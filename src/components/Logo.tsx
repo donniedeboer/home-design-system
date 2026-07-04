@@ -16,6 +16,7 @@ export type AppGlyphName =
   | 'scout'
   | 'golinks'
   | 'devbot'
+  | 'foreman'
   | 'module';
 
 const stroke = {
@@ -93,6 +94,14 @@ export const glyphs: Record<AppGlyphName, ReactNode> = {
       <path d="M9 18h6" {...stroke} />
       <path d="M10 8v.01" {...stroke} />
       <path d="M14 8v.01" {...stroke} />
+    </g>
+  ),
+  // Clipboard-check — Tabler "clipboard-check": the foreman's clipboard (dev-loop oversight).
+  foreman: (
+    <g>
+      <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" {...stroke} />
+      <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" {...stroke} />
+      <path d="M9 14l2 2l4 -4" {...stroke} />
     </g>
   ),
   // Generic module — hollow rounded square + center dot (default/unassigned).

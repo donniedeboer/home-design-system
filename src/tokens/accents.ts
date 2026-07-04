@@ -38,6 +38,7 @@ export type AccentName =
   | 'scout'
   | 'golinks'
   | 'devbot'
+  | 'foreman'
   | 'neutral';
 
 export interface Accent {
@@ -199,6 +200,10 @@ const SEEDS: Record<AccentName, Seed> = {
   scout:   { accent: '#14b8a6', accentHover: '#2dd4bf', accentSubtle: '#032725', accentMuted: '#0f766e', accentText: '#5eead4', ring: '#2dd4bf' },
   golinks: { accent: '#0ea5e9', accentHover: '#38bdf8', accentSubtle: '#0c2a3f', accentMuted: '#075985', accentText: '#7dd3fc', ring: '#38bdf8' },
   devbot:  { accent: '#f59e0b', accentHover: '#fbbf24', accentSubtle: '#451a03', accentMuted: '#78350f', accentText: '#fcd34d', ring: '#fbbf24' },
+  // Foreman = VIOLET (the amethyst slot Persona vacated for orchid — proven distinct beside
+  // omni's indigo). Deliberately COOL: Foreman's views are dense with warning/danger/success
+  // phase chips, so a warm accent (the thematic hard-hat orange) would read as data.
+  foreman: { accent: '#8b5cf6', accentHover: '#a78bfa', accentSubtle: '#2e1065', accentMuted: '#5b21b6', accentText: '#c4b5fd', ring: '#a78bfa' },
   neutral: { accent: '#64748b', accentHover: '#94a3b8', accentSubtle: '#1e293b', accentMuted: '#334155', accentText: '#cbd5e1', ring: '#94a3b8' },
 };
 

@@ -52,10 +52,11 @@ if (process.argv.includes('--css')) {
   console.log('\n/* ── design-tokens.css :root default (neutral) ── */');
   console.log(accentThemeBlock('neutral').replace('@theme {\n', '').replace('\n}', ''));
   console.log('\n/* ── per-app recipe comments (paste into both token files) ── */');
-  const order: AccentName[] = ['omni', 'persona', 'pulse', 'scout', 'golinks', 'devbot'];
+  const order: AccentName[] = ['omni', 'persona', 'pulse', 'scout', 'golinks', 'devbot', 'foreman'];
   const label: Record<string, string> = {
     omni: 'Omni (indigo)', persona: 'Persona (orchid)', pulse: 'Pulse (emerald)',
     scout: 'Scout (teal)', golinks: 'go-links (sky)', devbot: 'devbot (amber)',
+    foreman: 'Foreman (violet)',
   };
   for (const name of order) {
     const a = accents[name];
