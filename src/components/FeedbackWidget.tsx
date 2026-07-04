@@ -51,7 +51,15 @@ function initConsoleCapture() {
 export default function FeedbackWidget({
   appName = '',
   endpoint = '/api/feedback',
-}: { appName?: string; endpoint?: string } = {}) {
+  trigger = 'floating',
+}: {
+  appName?: string;
+  endpoint?: string;
+  /** 'floating' = the legacy bottom-right FAB. 'inline' = a compact TopNav-actions button
+   *  (mount next to the identity chip) whose panel drops below the nav — the FAB kept
+   *  colliding with docked chat panels (owner ruling: feedback lives up top, out of the way). */
+  trigger?: 'floating' | 'inline';
+} = {}) {
   const [open, setOpen] = useState(false);
   const [thread, setThread] = useState<FeedbackThreadMessage[]>([]);
   const [input, setInput] = useState('');
@@ -136,6 +144,19 @@ export default function FeedbackWidget({
   const round = thread.filter((m) => m.role === 'assistant').length;
 
   if (!open) {
+    if (trigger === 'inline') {
+      return (
+        <button
+          type="button"
+          aria-label="Send feedback"
+          title="Send feedback"
+          onClick={() => setOpen(true)}
+          className="flex h-8 w-8 items-center justify-center rounded-md text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--color-ring)]"
+        >
+          <ChatIcon />
+        </button>
+      );
+    }
     return (
       <button
         type="button"
@@ -151,7 +172,11 @@ export default function FeedbackWidget({
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="fixed bottom-4 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)]">
+    <div
+      className={`fixed z-50 w-[360px] max-w-[calc(100vw-2rem)] ${
+        trigger === 'inline' ? 'right-4 top-14' : 'bottom-4 right-4'
+      }`}
+    >
       <div className="flex max-h-[min(70vh,560px)] flex-col overflow-hidden rounded-2xl border border-border bg-surface-0 shadow-pop">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <span className="text-sm font-semibold text-fg">Send feedback</span>

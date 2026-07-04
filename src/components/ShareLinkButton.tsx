@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Button from './Button';
 
 /**
  * ShareLinkButton — the ONE copy-a-share-link control for the suite (contract in
@@ -58,16 +59,26 @@ export default function ShareLinkButton({
     : state === 'failed' ? 'Couldn’t create link'
     : label;
 
-  const cls =
-    variant === 'menu-item'
-      ? `flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-2 ${className}`
-      : `inline-flex items-center gap-1.5 rounded-lg border border-border-control bg-surface-0 px-3 py-1.5 text-sm font-medium text-fg transition-colors hover:bg-surface-2 disabled:cursor-default disabled:opacity-70 ${className}`;
-
+  if (variant === 'menu-item') {
+    return (
+      <button
+        type="button"
+        onClick={() => void onClick()}
+        disabled={state === 'busy'}
+        className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-fg transition-colors hover:bg-surface-2 ${className}`}
+      >
+        <ShareIcon />
+        {text}
+      </button>
+    );
+  }
+  // The standalone trigger IS a DS Button (secondary/sm) — share sits next to other header
+  // actions and must read as the same control family, never a one-off floating style.
   return (
-    <button type="button" onClick={() => void onClick()} disabled={state === 'busy'} className={cls}>
+    <Button variant="secondary" size="sm" onClick={() => void onClick()} disabled={state === 'busy'} className={className}>
       <ShareIcon />
       {text}
-    </button>
+    </Button>
   );
 }
 
