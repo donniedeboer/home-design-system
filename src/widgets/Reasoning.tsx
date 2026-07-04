@@ -150,6 +150,11 @@ export function ReasoningBlock({
   if (!tone && !whyText && !adviceText && proList.length === 0 && conList.length === 0) return null;
   return (
     <div className="mt-3 space-y-2">
+      {/* Authorship label: this block IS Scout's pass-1 voice — naming it (and its depth)
+          keeps it from reading as a rival take next to the full deep-research write-up. */}
+      <div className="text-[11px] font-semibold uppercase tracking-[0.09em] text-fg-subtle">
+        {provisional ? 'Scout’s initial take — from listing data so far' : 'Scout’s take at a glance'}
+      </div>
       {tone && (
         <div>
           <FitChip fit={fit} provisional={provisional} />

@@ -1,4 +1,5 @@
 'use client';
+import type { ReactNode } from 'react';
 import type { ListingData, WidgetProps } from './types';
 import { Chip, DataGrid } from '../components/data';
 import Button from '../components/Button';
@@ -19,7 +20,18 @@ function money(n?: number): string | undefined {
  * Research transparency: compact shows a "n/m researched" chip, full a ✓/○ dimension row;
  * tier 'triage' renders score/fit muted with a "~" (provisional, not deep-researched).
  */
-export default function ListingCard({ data, variant = 'compact', onAction }: WidgetProps<ListingData>) {
+export default function ListingCard({
+  data,
+  variant = 'compact',
+  onAction,
+  actionSlot,
+}: WidgetProps<ListingData> & {
+  /** Host-provided control rendered near the TOP of the full variant (chips row, right-
+   *  aligned) — e.g. Scout's "Run full analysis". The logical next step for an interesting
+   *  item belongs by the headline, not below the fold. Direct-render prop only (the Widget
+   *  dispatcher's JSON descriptors can't carry nodes). */
+  actionSlot?: ReactNode;
+}) {
   const price = money(data.price);
   const dropped = data.lastPrice != null && data.price != null && data.price < data.lastPrice;
   const metaLine = [
@@ -105,7 +117,10 @@ export default function ListingCard({ data, variant = 'compact', onAction }: Wid
           </div>
           {price && <div className="shrink-0 text-lg font-semibold tabular-nums text-fg">{price}</div>}
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">{chips}</div>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {chips}
+          {actionSlot && <span className="ml-auto">{actionSlot}</span>}
+        </div>
         <ResearchRow research={data.research} className="mt-2" />
 
         {data.photos && data.photos.length > 0 && (
