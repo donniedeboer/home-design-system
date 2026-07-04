@@ -51,12 +51,13 @@ export interface AgentChatProps {
   /** async token stream the app feeds from its own transport. */
   stream?: AsyncIterable<ChatStreamEvent>;
   /** composer submit. */
-  onSend?: (text: string) => void;
+  onSend?: (text: string, images?: { media_type: string; data: string }[], previews?: { dataUrl: string }[]) => void;
   /** widget interaction round-trip; defaults to onSend. */
   onWidgetAction?: WidgetAction;
   /** render a widget descriptor (override to use in-app renderers); defaults to the shared registry. */
   renderWidget?: (descriptor: WidgetDescriptor, onAction: WidgetAction) => ReactNode;
-  /** the 3px accent left-rule marking assistant turns (default true). */
+  /** the 3px accent left-rule marking assistant turns. Default FALSE — the suite dropped
+   *  the rail (owner ruling: match Omni everywhere); speaker labels carry the attribution. */
   assistantRail?: boolean;
   placeholder?: string;
   /** disable the composer (e.g. while a turn is in flight). */
@@ -75,7 +76,7 @@ export default function AgentChat({
   onSend,
   onWidgetAction,
   renderWidget,
-  assistantRail = true,
+  assistantRail = false,
   placeholder = 'Message…',
   busy = false,
   header,
@@ -239,29 +240,117 @@ function StreamingCaret() {
   );
 }
 
+const IMG_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+const IMG_MAX_BYTES = 5 * 1024 * 1024;
+const IMG_MAX_COUNT = 4;
+
 function Composer({
   onSend,
   placeholder,
   busy,
 }: {
-  onSend: (text: string) => void;
+  onSend: (text: string, images?: { media_type: string; data: string }[], previews?: { dataUrl: string }[]) => void;
   placeholder: string;
   busy: boolean;
 }) {
   const [value, setValue] = useState('');
+  // Image attachments (paste / drag-drop / picker) — extracted from Omni's composer so EVERY
+  // chat surface (side panels included) accepts pictures, not just the main Omni UI.
+  const [attachments, setAttachments] = useState<{ id: number; media_type: string; data: string; dataUrl: string }[]>([]);
+  const [note, setNote] = useState('');
+  const nextId = useRef(1);
   const taRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+
+  const readFile = (file: File): Promise<{ dataUrl: string; data: string } | null> =>
+    new Promise((resolve) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const url = String(r.result || '');
+        const comma = url.indexOf(',');
+        resolve(comma >= 0 ? { dataUrl: url, data: url.slice(comma + 1) } : null);
+      };
+      r.onerror = () => resolve(null);
+      r.readAsDataURL(file);
+    });
+
+  const addFiles = async (files: FileList | File[]) => {
+    const skipped: string[] = [];
+    const next = [...attachments];
+    for (const file of Array.from(files)) {
+      if (!file || !file.type) continue;
+      if (!IMG_TYPES.includes(file.type)) { skipped.push(`${file.name || 'image'} (unsupported type)`); continue; }
+      if (file.size > IMG_MAX_BYTES) { skipped.push(`${file.name || 'image'} (over ${IMG_MAX_BYTES / (1024 * 1024)}MB)`); continue; }
+      if (next.length >= IMG_MAX_COUNT) { skipped.push(`max ${IMG_MAX_COUNT} images`); break; }
+      const res = await readFile(file);
+      if (!res) { skipped.push(`${file.name || 'image'} (read failed)`); continue; }
+      next.push({ id: nextId.current++, media_type: file.type, data: res.data, dataUrl: res.dataUrl });
+    }
+    setAttachments(next);
+    if (skipped.length) {
+      setNote('Skipped: ' + skipped.join(', '));
+      setTimeout(() => setNote(''), 4000);
+    }
+  };
 
   const submit = () => {
     const t = value.trim();
-    if (!t || busy) return;
-    onSend(t);
+    if ((!t && !attachments.length) || busy) return;
+    onSend(
+      t,
+      attachments.map((a) => ({ media_type: a.media_type, data: a.data })),
+      attachments.map((a) => ({ dataUrl: a.dataUrl })),
+    );
     setValue('');
+    setAttachments([]);
     if (taRef.current) taRef.current.style.height = 'auto';
   };
 
   return (
     <div className="border-t border-border pt-2">
+      {note && <div className="mb-1.5 text-[11.5px] text-danger">{note}</div>}
+      {attachments.length > 0 && (
+        <div className="mb-1.5 flex flex-wrap gap-1.5">
+          {attachments.map((a) => (
+            <div key={a.id} className="relative h-[52px] w-[52px] overflow-hidden rounded-md border border-border bg-surface-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={a.dataUrl} alt="attachment" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                title="Remove"
+                aria-label="Remove attachment"
+                onClick={() => setAttachments((prev) => prev.filter((o) => o.id !== a.id))}
+                className="absolute right-[2px] top-[2px] grid h-[16px] w-[16px] place-items-center rounded-full bg-black/65 text-[10px] text-white hover:bg-danger"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex items-end gap-2 rounded-2xl border border-border-control bg-surface-0 px-3 py-2 focus-within:border-[color:var(--color-accent)]">
+        <input
+          ref={fileRef}
+          type="file"
+          accept={IMG_TYPES.join(',')}
+          multiple
+          hidden
+          onChange={() => {
+            if (fileRef.current?.files) void addFiles(fileRef.current.files);
+            if (fileRef.current) fileRef.current.value = '';
+          }}
+        />
+        <button
+          type="button"
+          title="Attach image (or paste / drag-drop)"
+          aria-label="Attach image"
+          onClick={() => fileRef.current?.click()}
+          className="grid h-8 w-8 shrink-0 place-items-center self-end rounded-md text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+          </svg>
+        </button>
         <textarea
           ref={taRef}
           value={value}
@@ -280,12 +369,30 @@ function Composer({
               submit();
             }
           }}
+          onPaste={(e) => {
+            const files = [...(e.clipboardData?.items || [])]
+              .filter((it) => it.kind === 'file' && it.type.startsWith('image/'))
+              .map((it) => it.getAsFile())
+              .filter((f): f is File => !!f);
+            if (files.length) {
+              e.preventDefault();
+              void addFiles(files);
+            }
+          }}
+          onDragOver={(e) => {
+            if ([...(e.dataTransfer?.types || [])].includes('Files')) e.preventDefault();
+          }}
+          onDrop={(e) => {
+            if (!e.dataTransfer?.files?.length) return;
+            e.preventDefault();
+            void addFiles(e.dataTransfer.files);
+          }}
           className="max-h-40 flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-fg outline-none placeholder:text-fg-subtle"
         />
         <button
           type="button"
           onClick={submit}
-          disabled={busy || !value.trim()}
+          disabled={busy || (!value.trim() && !attachments.length)}
           aria-label="Send message"
           className="relative flex h-8 w-8 shrink-0 items-center justify-center self-end rounded-full bg-[color:var(--color-accent-btn)] text-[15px] text-[color:var(--color-accent-fg)] transition-colors hover:bg-[color:var(--color-accent-btn-hover)] disabled:opacity-40 [@media(pointer:coarse)]:before:absolute [@media(pointer:coarse)]:before:left-1/2 [@media(pointer:coarse)]:before:top-1/2 [@media(pointer:coarse)]:before:h-11 [@media(pointer:coarse)]:before:w-11 [@media(pointer:coarse)]:before:-translate-x-1/2 [@media(pointer:coarse)]:before:-translate-y-1/2 [@media(pointer:coarse)]:before:content-['']"
         >

@@ -42,6 +42,9 @@ export interface AgentChatModalProps {
   /** Prefill the composer when the modal OPENS (never auto-sends) — the "chat about THIS
    *  thing" entry point: the host addresses the subject, the person writes the ask. */
   initialDraft?: string;
+  /** Host control rendered in the header next to the close button — e.g. Scout's
+   *  "Continue in Omni" graduate action. */
+  headerAction?: ReactNode;
   /** Local intro transcript (not sent to the model — the server owns history via scopeKey). */
   seedLines?: SeedLine[];
   placeholder?: string;
@@ -79,6 +82,7 @@ export default function AgentChatModal({
   title,
   suggestions,
   initialDraft,
+  headerAction,
   seedLines = [],
   placeholder,
   buildBody,
@@ -89,8 +93,8 @@ export default function AgentChatModal({
   const rootRef = useRef<HTMLDivElement | null>(null);
 
   const body = useCallback(
-    (text: string, _images: OutgoingImage[], _ctx: { sessionId: string | null }) =>
-      buildBody ? buildBody(text, scopeKey) : { message: text, scopeKey },
+    (text: string, images: OutgoingImage[], _ctx: { sessionId: string | null }) =>
+      buildBody ? buildBody(text, scopeKey) : { message: text, scopeKey, ...(images.length ? { images } : {}) },
     [buildBody, scopeKey],
   );
 
@@ -127,7 +131,8 @@ export default function AgentChatModal({
     <div ref={rootRef} className={`flex h-full min-h-0 flex-col ${className ?? ''}`}>
       {title ? (
         <div className="mb-2 flex items-center justify-between gap-2">
-          <div className="text-[15px] font-semibold text-fg">{title}</div>
+          <div className="min-w-0 truncate text-[15px] font-semibold text-fg">{title}</div>
+          {headerAction ? <div className="ml-auto shrink-0">{headerAction}</div> : null}
           <button
             type="button"
             aria-label="Close"
@@ -154,7 +159,7 @@ export default function AgentChatModal({
       ) : null}
       <AgentChat
         messages={messages}
-        onSend={session.send}
+        onSend={(text, images, previews) => session.send(text, images, previews)}
         onWidgetAction={handleWidgetAction}
         renderWidget={renderWidget}
         busy={session.state.busy}
