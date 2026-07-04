@@ -17,6 +17,7 @@ export type AppGlyphName =
   | 'golinks'
   | 'devbot'
   | 'foreman'
+  | 'hub'
   | 'module';
 
 const stroke = {
@@ -102,6 +103,15 @@ export const glyphs: Record<AppGlyphName, ReactNode> = {
       <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" {...stroke} />
       <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" {...stroke} />
       <path d="M9 14l2 2l4 -4" {...stroke} />
+    </g>
+  ),
+  // App grid — Tabler "layout-grid": the suite hub / launcher (go/apps).
+  hub: (
+    <g>
+      <rect x="4" y="4" width="6" height="6" rx="1" {...stroke} />
+      <rect x="14" y="4" width="6" height="6" rx="1" {...stroke} />
+      <rect x="4" y="14" width="6" height="6" rx="1" {...stroke} />
+      <rect x="14" y="14" width="6" height="6" rx="1" {...stroke} />
     </g>
   ),
   // Generic module — hollow rounded square + center dot (default/unassigned).
