@@ -9,4 +9,5 @@
  * Same single implementation as ever — this barrel just re-exports it un-stamped.
  */
 export * from './widgets/dynamicLayout';
+export * from './share';
 export type * from './widgets/types';

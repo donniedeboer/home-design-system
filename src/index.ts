@@ -23,6 +23,8 @@ export { default as SideNav, SideNavItem, SideNavLabel, type NavSection } from '
 // ── Chrome primitives ────────────────────────────────────────────────────────
 export { default as Modal } from './components/Modal';
 export { default as Button } from './components/Button';
+export { default as ShareLinkButton } from './components/ShareLinkButton';
+export * from './share';
 export { Input, Select } from './components/Field';
 export { Chip, StatChip, StatGrid, DataGrid, ListRow, Card, CardList } from './components/data';
 export { default as FeedbackWidget } from './components/FeedbackWidget';
