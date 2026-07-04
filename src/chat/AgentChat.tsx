@@ -387,7 +387,7 @@ function Composer({
             e.preventDefault();
             void addFiles(e.dataTransfer.files);
           }}
-          className="max-h-40 flex-1 resize-none bg-transparent text-[15px] leading-[1.5] text-fg outline-none placeholder:text-fg-subtle"
+          className="max-h-40 flex-1 resize-none bg-transparent py-[5px] text-[15px] leading-[22px] text-fg outline-none placeholder:text-fg-subtle"
         />
         <button
           type="button"
