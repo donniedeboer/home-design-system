@@ -103,11 +103,22 @@ export function ResearchRow({ research, className = '' }: { research?: ResearchD
   );
 }
 
-/** WhyLine — the compact one-liner: truncated, italic, muted. */
-export function WhyLine({ why, className = '' }: { why?: string; className?: string }) {
+/** WhyLine — the compact take: italic, muted. `lines=1` (default) truncates to the classic
+ *  one-liner; `lines=3` clamps to three lines so a list card can show the take as PROSE
+ *  without ever being cut mid-first-sentence (owner ruling: uniform taller cards > ellipsis). */
+export function WhyLine({
+  why,
+  className = '',
+  lines = 1,
+}: {
+  why?: string;
+  className?: string;
+  lines?: 1 | 2 | 3;
+}) {
   const text = asStr(why);
   if (!text) return null;
-  return <div className={`truncate text-[11px] italic text-fg-muted ${className}`}>{text}</div>;
+  const clamp = lines === 1 ? 'truncate' : lines === 2 ? 'line-clamp-2' : 'line-clamp-3';
+  return <div className={`${clamp} text-[11px] leading-[1.45] italic text-fg-muted ${className}`}>{text}</div>;
 }
 
 function ReasonList({ items, glyph, glyphTone }: { items: string[]; glyph: string; glyphTone: string }) {

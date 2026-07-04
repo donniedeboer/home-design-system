@@ -69,12 +69,14 @@ export default function ListingCard({
     // a control tacked on after the card.
     const cardHref = data.scoutUrl ?? data.url;
     const showAnalyze = Boolean(onAction && data.analyzable);
+    // Uniform height across every row (owner ruling): min-h fits the 3-line take, so cards
+    // with shorter takes stay the SAME size instead of jittering the list rhythm.
     return (
-      <div className="relative flex items-stretch gap-3 rounded-xl border border-border bg-surface-0 p-0 transition-colors focus-within:border-border-strong hover:border-border-strong">
+      <div className="relative flex min-h-[9.75rem] items-stretch gap-3 rounded-xl border border-border bg-surface-0 p-0 transition-colors focus-within:border-border-strong hover:border-border-strong">
         <Hero
           url={data.photo_url}
           alt={data.address}
-          className="w-28 shrink-0 rounded-l-xl"
+          className="w-32 shrink-0 rounded-l-xl"
           fetchSlot={
             onAction && data.mediaFetchable ? (
               <MediaFetch
@@ -102,7 +104,7 @@ export default function ListingCard({
           </div>
           {cityLine && <div className="truncate text-[11px] text-fg-muted">{cityLine}</div>}
           {metaLine && <div className="mt-0.5 text-[11px] text-fg-subtle">{metaLine}</div>}
-          <WhyLine why={data.why} className="mt-0.5" />
+          <WhyLine why={data.why} lines={3} className="mt-1" />
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
             {price && <span className="text-sm font-semibold tabular-nums text-fg">{price}</span>}
             {chips}
