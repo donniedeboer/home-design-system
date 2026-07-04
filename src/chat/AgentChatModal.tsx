@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useRef, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import Modal from '../components/Modal';
 import AgentChat, { type ChatMessage } from './AgentChat';
 import { useAgentSession, type Entry, type OutgoingImage } from './useAgentSession';
@@ -39,6 +39,9 @@ export interface AgentChatModalProps {
   title?: ReactNode;
   /** Quick-suggestion chips that PREFILL the composer (never auto-send). */
   suggestions?: string[];
+  /** Prefill the composer when the modal OPENS (never auto-sends) — the "chat about THIS
+   *  thing" entry point: the host addresses the subject, the person writes the ask. */
+  initialDraft?: string;
   /** Local intro transcript (not sent to the model — the server owns history via scopeKey). */
   seedLines?: SeedLine[];
   placeholder?: string;
@@ -75,6 +78,7 @@ export default function AgentChatModal({
   dock = 'modal',
   title,
   suggestions,
+  initialDraft,
   seedLines = [],
   placeholder,
   buildBody,
@@ -103,6 +107,13 @@ export default function AgentChatModal({
     ta.focus();
     ta.setSelectionRange(text.length, text.length);
   }, []);
+
+  useEffect(() => {
+    if (!open || !initialDraft) return;
+    // Next tick: the dock/modal content (and its textarea) must exist before we can prefill.
+    const t = setTimeout(() => prefill(initialDraft), 0);
+    return () => clearTimeout(t);
+  }, [open, initialDraft, prefill]);
 
   const handleWidgetAction = useCallback<WidgetAction>(
     (cmd) => {
