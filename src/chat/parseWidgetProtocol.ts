@@ -36,14 +36,52 @@ function htmlUnescape(s: string): string {
     .replace(/&#x27;/gi, "'");
 }
 
-function coerceDescriptor(body: string): WidgetDescriptor | null {
-  try {
-    const obj = JSON.parse(htmlUnescape(body.trim()));
-    if (obj && typeof obj === 'object' && typeof obj.type === 'string' && 'data' in obj) {
-      return obj as WidgetDescriptor;
+/**
+ * Append the missing closers to JSON a model under-closed — the ONLY repair attempted,
+ * because appending closers cannot alter any value already present. The agent hand-writes
+ * fence JSON with no grammar enforcement, and one dropped `}` otherwise fails BOTH consumers
+ * silently (this parser falls back to raw prose — no Accept button — and the sidecar records
+ * no proposal; live incident on Scout search 17). Returns null when the text is broken some
+ * other way (mismatched closers, unterminated string): that is not a truncation.
+ */
+export function repairJsonClosers(s: string): string | null {
+  const stack: string[] = [];
+  let inStr = false;
+  let esc = false;
+  for (const ch of s) {
+    if (esc) {
+      esc = false;
+      continue;
     }
-  } catch {
-    /* not-yet-valid or malformed JSON → treat as unresolved */
+    if (inStr) {
+      if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '{') stack.push('}');
+    else if (ch === '[') stack.push(']');
+    else if (ch === '}' || ch === ']') {
+      if (stack.pop() !== ch) return null; // mismatched — not a simple truncation
+    }
+  }
+  if (inStr || !stack.length) return null; // unterminated string, or nothing to repair
+  return s + stack.reverse().join('');
+}
+
+function coerceDescriptor(body: string): WidgetDescriptor | null {
+  const text = htmlUnescape(body.trim());
+  for (const candidate of [text, repairJsonClosers(text)]) {
+    if (!candidate) continue;
+    try {
+      const obj = JSON.parse(candidate);
+      if (obj && typeof obj === 'object' && typeof obj.type === 'string' && 'data' in obj) {
+        return obj as WidgetDescriptor;
+      }
+      return null; // parsed but not a descriptor — repair wouldn't change that
+    } catch {
+      /* try the repaired form; malformed both ways → unresolved */
+    }
   }
   return null;
 }
