@@ -24,16 +24,21 @@
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* ---- Type scale ---- */
-  --text-xs: 0.6875rem;   /* 11px */
-  --text-sm: 0.8125rem;   /* 13px */
-  --text-base: 0.9375rem; /* 15px */
-  --text-md: 1rem;        /* 16px */
-  --text-reading: 0.9375rem; /* 15px — chat prose + fact values (Hearth graft) */
-  --text-lg: 1.125rem;    /* 18px */
-  --text-xl: 1.3125rem;   /* 21px */
-  --text-2xl: 1.625rem;   /* 26px */
+  /* ---- Type scale (size + leading pairs; values identical to design-tokens.css) ---- */
+  --text-xs: 0.6875rem;   --leading-xs: 1rem;       /* 11px */
+  --text-sm: 0.8125rem;   --leading-sm: 1.125rem;   /* 13px */
+  --text-base: 0.9375rem; --leading-base: 1.5rem;   /* 15px */
+  --text-md: 1rem;        --leading-md: 1.5625rem;  /* 16px */
+  --text-reading: 0.9375rem; --leading-reading: 1.6rem; /* 15px/25.6 — chat prose + fact values (Hearth graft) */
+  --text-lg: 1.125rem;    --leading-lg: 1.625rem;   /* 18px */
+  --text-xl: 1.3125rem;   --leading-xl: 1.75rem;    /* 21px */
+  --text-2xl: 1.625rem;   --leading-2xl: 2rem;      /* 26px */
+  --weight-normal: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 680;
   --tracking-label: 0.09em;
+
+  /* ---- Spacing (4px grid) ---- */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
 
   /* ---- Neutral surfaces (ramp non-monotonic on purpose: surface-1 = darkest floor) ---- */
   --color-surface-0: #252422; /* raised card / popover */
@@ -96,6 +101,7 @@
   --shadow-pop: 0 8px 28px -4px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.5);
 
   /* ---- Motion ---- */
+  --dur-fast: 120ms; --dur-base: 180ms; --dur-slow: 240ms;
   --ease-out: cubic-bezier(.2,.7,.3,1);
   --ease-in-out: cubic-bezier(.4,0,.2,1);
   --ease-spring: cubic-bezier(.34,1.4,.5,1);
@@ -171,12 +177,16 @@
   .ds-md > :first-child { margin-top: 0; }
   .ds-md > :last-child { margin-bottom: 0; }
   .ds-md p { margin: 0 0 var(--space-3); }
+  /* Heading rhythm (2026-07-02 typography pass): top margin is explicit + size-scaled
+     per level so it wins the margin-collapse vs the preceding block and reads as a
+     true section break — a flat --space-4 top was only 4px over the paragraph gap,
+     so sections clumped. Small bottom binds the heading to the content it introduces. */
   .ds-md h1, .ds-md h2, .ds-md h3, .ds-md h4, .ds-md h5, .ds-md h6 {
-    margin: var(--space-4) 0 var(--space-2); font-weight: var(--weight-semibold);
-    line-height: 1.3; letter-spacing: -0.012em; color: var(--color-fg);
+    margin: 1.25rem 0 var(--space-2); font-weight: var(--weight-semibold);
+    line-height: 1.25; letter-spacing: -0.012em; color: var(--color-fg);
   }
-  .ds-md h1 { font-size: var(--text-xl); }
-  .ds-md h2 { font-size: var(--text-lg); }
+  .ds-md h1 { font-size: var(--text-xl); margin-top: 2rem; }
+  .ds-md h2 { font-size: var(--text-lg); margin-top: 1.75rem; }
   .ds-md h3 { font-size: var(--text-md); }
   .ds-md h4, .ds-md h5, .ds-md h6 { font-size: var(--text-base); }
   .ds-md ul, .ds-md ol { margin: 0 0 var(--space-3); padding-left: 1.4em; }
